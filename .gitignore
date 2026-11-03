@@ -1,0 +1,42 @@
+# Vitalia SPEC Kit — .gitignore Oficial (v0.0.1)
+
+# Contexto de sessão e memória da IA (repositórios remotos isolados)
+.agents/*
+.gemini/*
+.vitalia/*
+.vitalia/config.yml
+.vitalia/memory/session/
+.vitalia/memory/data_storage/
+.vitalia/memory/data_storage/handoffs/*
+!.vitalia/memory/data_storage/handoffs/.gitkeep
+handoff_*.json
+context_*_output_*.json
+
+# Logs e dependências
+.DS_Store
+.docs/*
+/logs
+/node_modules
+
+# Variáveis de Ambiente e Segredos
+.env
+.env.*
+token.json
+credentials.json
+
+# Python e Testes
+.venv
+venv
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+/reports
+/.venv_check
+
+# IDEs
+.idea/
+.vscode/
+*.swp
