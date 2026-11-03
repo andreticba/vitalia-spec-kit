@@ -86,3 +86,47 @@ O agente gerará o `specs/001-sdd-judge-subagent/spec.md` cobrindo os 8 Requisit
 - **No repositório:** Todo o código do produto vive dentro de `source/` (`source/src/`, `source/profiles/`, `source/extensions/`).
 - **No kit global (`~/.vitalia/`):** O conteúdo de `source/` é espelhado diretamente sem a pasta intermediária `source/`. O LLM deve entender que qualquer alteração de código do kit deve ser feita em `source/` no repositório para posterior sincronização global.
 
+
+---
+
+## 6. Padrão Obrigatório de Schemas & Contratos JSON (Dialeto OpenAPI 3.0 / Gemini Compliant)
+
+- **Proibição de Meta-Campos:** Todos os schemas JSON de entidades e validação gerados pelo pipeline SDD (`spec-specify`, `spec-plan`, `data-model.md`) são estritamente proibidos de usar:
+  - `"$schema"` (ex: `http://json-schema.org/draft-07/schema#`)
+  - `"title"` (como nó raiz de schemas de validação)
+  - `"additionalProperties": false`
+- **Motivo Arquitetural:** O compilador REST do Google GenAI (Gemini) rejeita essas meta-chaves com erro HTTP 400.
+- **Separação Rígida:** Arquivos em `.vitalia/` (ex: `.vitalia/feature.json`) são instâncias de dados (`{"feature_directory": "...", "feature_numbering": "..."}`), nunca definições de schemas.
+
+---
+
+## 7. Fronteiras de Escopo: Herança Estável vs. Escopo Exclusivo da Spec 001
+
+
+### 7.1. Tabela de Inventário de Código Existente (Herança de 31-10-2026 — ONDE A IA DEVE CONSULTAR)
+
+O LLM que estiver planejando e implementando a feature DEVE consultar estes arquivos físicos já existentes e testados em vez de recriá-los:
+
+| Componente / Função | Caminho Exato no Repositório | Status / O que faz | Instrução para a IA |
+|---|---|---|---|
+| **`resolve_project_root()`** | `source/src/vitalia_handoff.py` (L25) | Sobe a árvore procurando raiz de projeto com `.vitalia/` | **NÃO RECRIAR.** Importar ou reutilizar via Python. |
+| **`resolve_storage_dir()`** | `source/src/vitalia_handoff.py` (L75) | Valida `data_storage` e previne vazamento de dados | **NÃO RECRIAR.** Consumida pelos leitores de handoff. |
+| **`logger.sh`** | `source/bin/lib/logger.sh` | Funções `log_ok`, `log_step`, `log_error` sob `pipefail` | **NÃO RECRIAR.** Já implementada e modular. |
+| **`env_manager.sh`** | `source/bin/lib/env_manager.sh` | Máquina de estados S1–S7 para variáveis em `.env` | **NÃO RECRIAR.** Já protege credenciais e evita duplicatas. |
+| **`agent_preserver.sh`** | `source/bin/lib/agent_preserver.sh` | Preservação de `AGENTS.md` com marcadores delimitados | **NÃO RECRIAR.** Gerencia blocos do kit sem quebrar o usuário. |
+| **`redis_detector.sh`** | `source/bin/lib/redis_detector.sh` | Probe de Redis com fallback para arquivo | **NÃO RECRIAR.** Já trata conexões e sanitiza URLs. |
+| **`git_storage_manager.sh`** | `source/bin/lib/git_storage_manager.sh`| Gestão de repositórios remotos de sessão e storage | **NÃO RECRIAR.** Já isola a persistência remota. |
+| **`install-project`** | `source/bin/install-project` | Script CLI instalador que consome as bibliotecas acima | **BASE PRONTA.** Alvo de sincronização para `~/.vitalia/`. |
+| **Extensões SDD Existentes** | `source/extensions/*.toml` | 10 arquivos TOML canônicos (`spec-specify`, `spec-plan`...) | **ALVO DE DIFF.** Refatorar apenas hooks do `sdd_judge`. |
+
+### 7.2. Regras de Fronteira: O que JÁ ESTÁ PRONTO (Herança Estável de 31-10-2026 — NÃO RECRIAR)
+- **Resolvedor de Raiz e Storage:** `resolve_project_root()` e `resolve_storage_dir()` já existem e estão 100% testadas em `source/src/vitalia_handoff.py`. O pipeline SDD NÃO deve propor criar novas funções com este propósito.
+- **Bibliotecas Shell Modulares:** `logger.sh`, `env_manager.sh` (matriz S1-S7), `agent_preserver.sh` (delimitadores VITALIA:KIT:START/END), `redis_detector.sh` e `git_storage_manager.sh` em `source/bin/lib/` já estão implementadas e testadas. NÃO recriar.
+- **Topologia de Symlinks (Capistrano):** Não implementar symlink swaps complexos de releases nesta versão. O kit opera com espelhamento direto de `source/` para `~/.vitalia/`.
+
+### 7.2. O que é o ESCOPO EXCLUSIVO desta Spec 001:
+1. **Identidade e Catálogo:** Registrar o Sub-Agente `sdd-judge` em `source/profiles/agents_catalog.yaml`.
+2. **Extensão e Skill do Juiz:** Criar `source/extensions/judge.toml` e skill correspondente para operação na IDE Antigravity.
+3. **Saneamento de Extensões Existentes:** Refatorar os 4 TOMLs em `source/extensions/` (`spec-specify.toml`, `spec-plan.toml`, `spec-tasks.toml`, `converge.toml`), eliminando invocações legadas do script CLI `sdd_judge.py` e substituindo-as pela recomendação/despacho do gate `/vitalia-judge`.
+4. **Governança Anti-Diluição:** Implementar Sanduíche Constitucional, Inverted CoT e Matriz 1-a-1.
+5. **Contratos OpenAPI 3.0:** Garantir que todo schema do kit siga OpenAPI 3.0 limpo (sem `$schema`, sem `title`, sem `additionalProperties: false`).

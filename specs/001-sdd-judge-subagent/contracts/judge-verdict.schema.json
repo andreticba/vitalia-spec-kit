@@ -1,0 +1,79 @@
+{
+  "type": "object",
+  "required": [
+    "phase",
+    "feature",
+    "verdict",
+    "timestamp",
+    "evaluations"
+  ],
+  "properties": {
+    "phase": {
+      "type": "string",
+      "enum": ["specify", "plan", "tasks", "converge"]
+    },
+    "feature": {
+      "type": "string",
+      "description": "Caminho relativo da feature auditada (specs/NNN-slug)"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["PASS", "WARN", "BLOCK"]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "Timestamp com fuso GMT-04:00"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Resumo executivo do parecer emitido"
+    },
+    "evaluations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "principle_id",
+          "principle_name",
+          "severity",
+          "status",
+          "critique"
+        ],
+        "properties": {
+          "principle_id": {
+            "type": "string",
+            "description": "ID do princípio constitucional (ex: P01)"
+          },
+          "principle_name": {
+            "type": "string",
+            "description": "Nome canônico do princípio"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["BLOCKING", "WARNING", "INFO"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["COMPLIANT", "VIOLATION", "NOT_APPLICABLE"]
+          },
+          "line_reference": {
+            "type": "string",
+            "description": "Referência de linhas no artefato"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Citação factual extraída"
+          },
+          "critique": {
+            "type": "string",
+            "description": "Análise crítica motivada"
+          },
+          "suggested_fix": {
+            "type": "string",
+            "description": "Orientação de correção quando aplicável"
+          }
+        }
+      }
+    }
+  }
+}

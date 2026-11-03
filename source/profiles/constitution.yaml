@@ -1,4 +1,4 @@
-# constitution.yaml | Vitalia SDD v0.6.0 | 07-09-2026 14:19(GMT-04:00)
+# constitution.yaml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
 # Schema: Dual-Index (Opção D) — O(1) lookup por domain_id e principle_id
 # Fontes: docs/rules/always-on/*.md + docs/rules/file-triggered/*.md
 #         + OWASP LLM Top 10 2025 + EU AI Act Art.12 + CMAG 2025/2026
@@ -180,14 +180,17 @@ principles:
     validator: "hooks/llm_judge.py --mode after_task"
 
   P11:
-    name: "Hardware-Agnostic LLM Routing & Machine Identity"
+    name: "Hardware-Agnostic LLM Routing, Data Contracts & Machine Identity"
     domain: "HARDWARE_AGNOSTICISM"
     severity: "BLOCKING"
     rule: >
       Nenhum nome de modelo LLM hardcoded — vem de .env (NO1_MODEL,
-      NO2_MODEL, ROUTER_LLM_PROFILE etc.). Nenhum machine_id hardcoded —
-      deriva de VITALIA_MACHINE_NAME env var ou socket.gethostname() via
-      SHA256[:8]. Builds reprodutíveis: local = produção.
+      NO2_MODEL, ROUTER_LLM_PROFILE etc.). Todo contrato de schema JSON no sistema
+      deve seguir estritamente o subset OpenAPI 3.0 limpo, sendo terminantemente proibidos
+      meta-campos incompatíveis com compiladores REST de LLM como '$schema', 'title' e
+      'additionalProperties: false'. Instâncias de runtime (.vitalia/*.json) são dados planos,
+      nunca definições de schemas. Nenhum machine_id hardcoded — deriva de VITALIA_MACHINE_NAME
+      env var ou socket.gethostname() via SHA256[:8]. Builds reprodutíveis: local = produção.
     rationale: >
       Sistema opera em hardware heterogêneo (GTX 1060 6GB, RTX 3090,
       CPU-only). Hardcodar quebra silenciosamente em hardware diferente.

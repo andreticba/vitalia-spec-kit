@@ -1,0 +1,171 @@
+<!-- tasks.md | Vitalia SPEC Kit v0.0.1 | 02-11-2026 23:25(GMT-04:00) -->
+> **tasks.md | Vitalia SPEC Kit v0.0.1 | 02-11-2026 23:25(GMT-04:00)**
+
+# Tasks: Sub-Agente SDD-Judge & Governança Constitucional Nativa
+
+**Spec**: [specs/001-sdd-judge-subagent/spec.md](file:///home/andre/projetos/assistidos/vitalia-spec-kit/specs/001-sdd-judge-subagent/spec.md)  
+**Plan**: [specs/001-sdd-judge-subagent/plan.md](file:///home/andre/projetos/assistidos/vitalia-spec-kit/specs/001-sdd-judge-subagent/plan.md)  
+**Gerado em**: 02-11-2026 23:25(GMT-04:00)  
+
+---
+
+## MVP Scope
+
+> **MVP Scope: Phase 0 + Phase 1 + Phase 2 + Phase 3 (US1) + Phase 4 (US2)**  
+> A entrega dessas fases implementa o Sub-Agente `sdd-judge`, sua skill na IDE, registra a identidade no catálogo de agentes e saneia as 4 extensões do ciclo SDD, eliminando definitivamente o script CLI legado e os erros de estouro de tokens.
+
+---
+
+## Phase 0: Grounding & Environment
+
+*Verificações de integridade de ambiente e baseline de runtime.*
+
+- [ ] T000-A Verificar integridade do interpretador Python: `python3 --version`
+- [ ] T000-B [P] Verificar conformidade das fontes técnicas HTTP 200 listadas em [specs/001-sdd-judge-subagent/research.md](file:///home/andre/projetos/assistidos/vitalia-spec-kit/specs/001-sdd-judge-subagent/research.md)
+- [ ] T000-C [P] Inspecionar estado da herança estável de 31-10 em [source/src/vitalia_handoff.py](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/src/vitalia_handoff.py) e [source/bin/lib/](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/bin/lib) confirmando ausência de alterações não autorizadas
+
+---
+
+## Phase 1: Setup & Identity
+
+*Registro oficial da identidade do sub-agente e preparação de contratos.*
+
+- [ ] T001 Registrar entidade do agente `sdd-judge` em [source/profiles/agents_catalog.yaml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/profiles/agents_catalog.yaml) com `status: "active"`, `model_hint: "frontier"`, gates e `hitl_required: true` (FR-002)
+- [ ] T002 Validar schema OpenAPI 3.0 do veredito de inspeção em [specs/001-sdd-judge-subagent/contracts/judge-verdict.schema.json](file:///home/andre/projetos/assistidos/vitalia-spec-kit/specs/001-sdd-judge-subagent/contracts/judge-verdict.schema.json) certificando ausência de `$schema` e `title` (RN-002)
+
+---
+
+## Phase 2: Foundational
+
+*Criação dos artefatos estruturais de workflow e comandos do Sub-Agente.*
+
+- [ ] T003 Criar extensão de workflow [source/extensions/judge.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/judge.toml) configurando injeção integral de `constitution.yaml`, `context_decisions` e `context_learnings` via Guardian (§11) (FR-003)
+- [ ] T004 Criar skill de acionamento nativo na IDE em [.agents/skills/vitalia-judge/SKILL.md](file:///home/andre/projetos/assistidos/vitalia-spec-kit/.agents/skills/vitalia-judge/SKILL.md) com runner de hook e leitura de contexto (FR-003)
+
+---
+
+## Phase 3: User Story 1 — Auditoria Constitucional Integral na Especificação
+
+**Story Goal**: Permitir ao desenvolvedor executar `/vitalia-judge --mode=specify` para auditar a `spec.md` contra toda a Constituição sem degradação ou fatiamento de regras.  
+**Independent Test**: Executar `/vitalia-judge --mode=specify` e validar a emissão do artefato físico [specs/001-sdd-judge-subagent/Relatório de Inspeção - specify.md](file:///home/andre/projetos/assistidos/vitalia-spec-kit/specs/001-sdd-judge-subagent/Relat%C3%B3rio%20de%20Inspe%C3%A7%C3%A3o%20-%20specify.md) com status `PASS`.  
+**Referência**: FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007  
+
+- [ ] T005 [US1] Implementar prompt do Sub-Agente com Sanduíche Constitucional (Primacy Bias P00-P20 e Recency Checklist) em [source/extensions/judge.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/judge.toml) (FR-004)
+- [ ] T006 [P] [US1] Configurar protocolo Inverted Chain-of-Thought (Critique-First ➔ Verdict-Last) e delimitação por tags XML em [source/extensions/judge.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/judge.toml) (FR-004)
+- [ ] T007 [P] [US1] Implementar módulo de confronto quádruplo da Fase 1 (`spec.md`) cobrindo princípios, ADRs, aprendizados e ISO 29148 em [source/extensions/judge.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/judge.toml) (FR-005)
+- [ ] T008 [US1] Configurar rotina de ingestão documental sob demanda via ferramentas nativas (`view_file`, `grep_search`) para artefatos de apoio da feature em [source/extensions/judge.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/judge.toml) (FR-006)
+- [ ] T009 [US1] Implementar geração física do artefato `Relatório de Inspeção - {fase}.md` e pausa mandatória HITL em [source/extensions/judge.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/judge.toml) (FR-007)
+
+---
+
+## Phase 4: User Story 2 — Saneamento dos Workflows SDD Sem Quebras de Execução
+
+**Story Goal**: Eliminar invocações ao CLI legado `sdd_judge.py` das 4 extensões centrais em `source/extensions/`, substituindo-as pelo gate nativo `/vitalia-judge`.  
+**Independent Test**: Executar `grep -rn "sdd_judge.py" source/extensions/` e certificar zero ocorrências.  
+**Referência**: FR-008  
+
+- [ ] T010 [P] [US2] Refatorar [source/extensions/spec-specify.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/spec-specify.toml), eliminando chamada a `sdd_judge.py` e apontando para o Sub-Agente `/vitalia-judge`
+- [ ] T011 [P] [US2] Refatorar [source/extensions/spec-plan.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/spec-plan.toml), eliminando chamada a `sdd_judge.py` e apontando para o Sub-Agente `/vitalia-judge`
+- [ ] T012 [P] [US2] Refatorar [source/extensions/spec-tasks.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/spec-tasks.toml), eliminando chamada a `sdd_judge.py` e orientando handoff para `/vitalia-task-verifier`
+- [ ] T013 [P] [US2] Refatorar [source/extensions/converge.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/converge.toml), eliminando chamada a `sdd_judge.py` e apontando para o Sub-Agente `/vitalia-judge`
+
+---
+
+## Phase 5: User Story 3 — Validação Sem Erro 400 em Chamadas de Estruturação
+
+**Story Goal**: Garantir que todos os schemas JSON do kit sejam estritamente compatíveis com OpenAPI 3.0 e a API REST do Google Gemini.  
+**Independent Test**: Executar busca estrita por `$schema`, `title` (raiz) ou `additionalProperties: false` em todos os schemas gerados e confirmar zero violações.  
+**Referência**: RN-002, P11  
+
+- [ ] T014 [US3] Auditar e validar todos os arquivos JSON Schema em [specs/001-sdd-judge-subagent/contracts/](file:///home/andre/projetos/assistidos/vitalia-spec-kit/specs/001-sdd-judge-subagent/contracts/) para conformidade estrita com OpenAPI 3.0
+- [ ] T015 [US3] Certificar que [.vitalia/feature.json](file:///home/andre/projetos/assistidos/vitalia-spec-kit/.vitalia/feature.json) permaneça como instância de dados planos sem metacampos de schema
+
+---
+
+## Phase 6: User Story 4 — Governança Transparente com Human-in-the-Loop Soberano
+
+**Story Goal**: Assegurar que todas as auditorias adversariais gerem relatórios persistentes e exijam aprovação humana explícita antes de qualquer transição de fase.  
+**Independent Test**: Confirmar a presença de `Relatório de Inspeção - specify.md` e `Relatório de Inspeção - plan.md` com status `PASS` e aprovações humanas registradas no histórico.  
+**Referência**: FR-007, RN-003, RN-004  
+
+- [ ] T016 [US4] Validar que o prompt de [source/extensions/judge.toml](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source/extensions/judge.toml) contenha o bloco mandatório de pausa HITL com perguntas estruturadas
+- [ ] T017 [US4] Aplicar cabeçalhos com carimbo temporal P04 em todos os arquivos modificados em `source/` e `.agents/skills/`
+
+---
+
+## Phase 7: Polish, Espelhamento & Testes de Integração
+
+*Sincronização com kit global, testes automatizados e validação final.*
+
+- [ ] T018 [P] Espelhar arquivos criados/modificados de [source/](file:///home/andre/projetos/assistidos/vitalia-spec-kit/source) para o kit global em `~/.vitalia/` (`extensions/`, `profiles/`, `bin/`)
+- [ ] T019 [P] Executar suite de testes de integridade com `pytest` para verificar que o hook runner carrega as novas extensões sem erros sintáticos
+- [ ] T020 Executar cenário de validação completo conforme [specs/001-sdd-judge-subagent/quickstart.md](file:///home/andre/projetos/assistidos/vitalia-spec-kit/specs/001-sdd-judge-subagent/quickstart.md) e registrar relatório de prontidão
+
+---
+
+## Dependency Graph
+
+```mermaid
+flowchart TD
+  subgraph Grounding["Phase 0: Grounding & Baseline"]
+    T000A["T000-A: Python version"]
+    T000B["T000-B: Grounding sources"]
+    T000C["T000-C: Verify 31-10 stable base"]
+  end
+
+  subgraph Setup["Phase 1: Setup & Identity"]
+    T001["T001: Register sdd-judge in agents_catalog.yaml"]
+    T002["T002: Validate OpenAPI 3.0 schema"]
+  end
+
+  subgraph Foundation["Phase 2: Foundational"]
+    T003["T003: Create judge.toml extension"]
+    T004["T004: Create vitalia-judge SKILL.md"]
+  end
+
+  subgraph US1["Phase 3: US1 - Constitutional Judge Engine"]
+    T005["T005: Constitutional Sandwich Prompt"]
+    T006["T006: Inverted CoT Protocol"]
+    T007["T007: Phase 1 (spec.md) 4-Way Confrontation"]
+    T008["T008: On-Demand Document Ingestion"]
+    T009["T009: Physical Report & HITL Pause"]
+  end
+
+  subgraph US2["Phase 4: US2 - Extension Sanitization"]
+    T010["T010: Sanitize spec-specify.toml"]
+    T011["T011: Sanitize spec-plan.toml"]
+    T012["T012: Sanitize spec-tasks.toml"]
+    T013["T013: Sanitize converge.toml"]
+  end
+
+  subgraph US34["Phase 5 & 6: Schemas & HITL Governance"]
+    T014["T014: OpenAPI 3.0 Schema Audit"]
+    T015["T015: feature.json flat instance check"]
+    T016["T016: HITL Prompt Pause Validation"]
+    T017["T017: P04 Header Stamp Integrity"]
+  end
+
+  subgraph Polish["Phase 7: Mirroring & Testing"]
+    T018["T018: Mirror to ~/.vitalia/"]
+    T019["T019: Pytest validation"]
+    T020["T020: Quickstart scenario execution"]
+  end
+
+  Grounding --> Setup
+  Setup --> Foundation
+  Foundation --> US1
+  Foundation --> US2
+  US1 --> US34
+  US2 --> US34
+  US34 --> Polish
+```
+
+---
+
+## Parallel Execution
+
+As seguintes tarefas marcadas com `[P]` não possuem interdependência e podem ser executadas em paralelo:
+- **Phase 0**: T000-B e T000-C
+- **Phase 3 (US1)**: T006 e T007
+- **Phase 4 (US2)**: T010, T011, T012 e T013
+- **Phase 7 (Polish)**: T018 e T019

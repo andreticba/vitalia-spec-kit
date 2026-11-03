@@ -1,4 +1,4 @@
-# vitalia_handoff.py | Vitalia SDD v0.6.0 | 18-10-2026 11:25(GMT-04:00)
+# vitalia_handoff.py | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
 """
 Módulo de utilitários e CLI para criação, validação estrutural e consumo atômico
 de handoffs inter-agente locais em .vitalia/memory/data_storage/handoffs/.

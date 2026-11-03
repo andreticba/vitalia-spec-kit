@@ -1,0 +1,73 @@
+# converge.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+description = "Avalia o código real do repositório contra spec/plan/tasks de uma feature e reconcilia o tasks.md via Sub-Agente /vitalia-judge --mode converge."
+
+[meta]
+version = "0.6.0"
+hardware_profile = "heavy"
+domain_gates = []
+model_profile = "pro"
+
+[hooks]
+before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+after  = []
+
+[tools]
+required = ["read_file", "list_dir", "grep_search", "write_file"]
+optional = []
+
+[context]
+reads = ["specs/", "src/", "kit-global/", "tests/", "extensions/", ".env"]
+writes = ["specs/"]
+
+[guardian]
+constitution = true
+routing = true
+agents = true
+
+[transport]
+preferred = "redis"
+redis_key = "vitalia:workflow:converge"
+file_path = ".vitalia/pipeline.json"
+session_shard = true
+
+prompt = """
+## User Input
+
+```text
+{{args}}
+```
+
+# /vitalia-converge — O Auditor SDD e Reconciliador de Código
+
+---
+
+## Propósito
+
+Fazer a reconciliação quadridimensional entre artefatos SDD (`spec.md`, `plan.md`, `tasks.md`) e a base de código real no disco.
+Utiliza o Sub-Agente `/vitalia-judge --mode=converge` nativo na IDE para validação semântica de código, identificação de requisitos órfãos, arquivos não-rastreados, tarefas falsamente concluídas e inconsistências de nomenclatura.
+
+---
+
+## Comportamento
+
+1. **Leitura de Artefatos:** Obter `feature_directory` em `.vitalia/feature.json`.
+2. **Executar Reconciliador Constitucional (/vitalia-judge --mode=converge):**
+   - Acione o Sub-Agente `/vitalia-judge --mode=converge` diretamente na IDE.
+   - O juiz executará a auditoria adversarial confrontando código vs artefatos contratuais.
+
+3. **Análise Quadridimensional:**
+   - **Validação Semântica de Código:** Verificar se o código real em `src/` e testes atendem à semântica dos ACs e FRs (sem stubs vazios `pass` ou mocks incompletos).
+   - **Requisitos Órfãos:** Detectar `FR-xxx` sem tarefas no `tasks.md`.
+   - **Código Não-Rastreado:** Identificar arquivos de código-fonte no repositório não atribuídos a nenhuma tarefa aprovada.
+   - **Tarefas Falsamente Concluídas:** Detectar tarefas `[X]` sem código ou sem cobertura semântica.
+   - **Inconsistências de Nomenclatura:** Contradições entre nomes de símbolos na doc SDD e no código real.
+
+4. **Relatório Estruturado:** Apresentar o relatório com as seções:
+   - 📋 COVERAGE & SEMANTIC CODE ANALYSIS
+   - 📝 SPEC → PLAN → TASKS RECONCILIATION
+   - 📁 UNTRACKED CODE DETECTION
+   - 📐 NOMENCLATURE & TYPE CONSISTENCY
+   - ⚖️ CONSTITUTIONAL VERDICT
+
+5. **Reconciliação do `tasks.md`:** Reconciliar o `tasks.md` desmarcando tarefas falsas ou adicionando tarefas corretivas.
+"""

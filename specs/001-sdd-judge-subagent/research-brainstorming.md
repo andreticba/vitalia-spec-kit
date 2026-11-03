@@ -5,6 +5,26 @@
 
 ## 1. Resumo Executivo das Decisões Tomadas
 
+
+### 1.2. Inventário Físico de Componentes Herdados (Caminhos para Inspeção pela IA)
+
+| Componente / Função | Caminho Exato no Repositório | Papel Arquitetural | Instrução para o SDD |
+|---|---|---|---|
+| **`resolve_project_root()`** | `source/src/vitalia_handoff.py` (L25) | Sobe a árvore procurando raiz com `.vitalia/` | **EXISTE E TESTADA.** Não recriar. |
+| **`resolve_storage_dir()`** | `source/src/vitalia_handoff.py` (L75) | Valida `data_storage` e previne vazamento de dados | **EXISTE E TESTADA.** Não recriar. |
+| **`logger.sh`** | `source/bin/lib/logger.sh` | Funções de log sob `set -euo pipefail` | **EXISTE E TESTADA.** Não recriar. |
+| **`env_manager.sh`** | `source/bin/lib/env_manager.sh` | Máquina S1–S7 de gestão segura do `.env` | **EXISTE E TESTADA.** Não recriar. |
+| **`agent_preserver.sh`** | `source/bin/lib/agent_preserver.sh` | Preservação delimitada de `AGENTS.md` | **EXISTE E TESTADA.** Não recriar. |
+| **`redis_detector.sh`** | `source/bin/lib/redis_detector.sh` | Sonda resiliente de Redis com fallback | **EXISTE E TESTADA.** Não recriar. |
+| **`git_storage_manager.sh`** | `source/bin/lib/git_storage_manager.sh`| Isolamento de remotes de sessão e storage | **EXISTE E TESTADA.** Não recriar. |
+| **`install-project`** | `source/bin/install-project` | Instalador do kit consumindo as libs shell | **EXISTE E TESTADA.** Base pronta. |
+| **Extensões SDD Existentes** | `source/extensions/*.toml` | 10 arquivos TOML canônicos do ciclo | **ALVO DE DIFF.** Refatorar apenas hooks do judge. |
+
+### 1.1 Fronteiras Arquiteturais e Herança Estável (31-10-2026)
+- **Código Herdado e Pronto:** `resolve_project_root()` em `source/src/vitalia_handoff.py` e as libs em `source/bin/lib/` (`env_manager.sh`, `agent_preserver.sh`, etc.) representam a base estável aprovada em 31-10-2026. Esta spec NÃO recria nem altera essas funções.
+- **Simplicidade de Operação:** A proposta de symlinks atômicos (Capistrano swap) foi descartada desta fase para manter a confiabilidade. O kit utiliza espelhamento canônico de `source/` para `~/.vitalia/`.
+
+
 Nesta sessão de brainstorming foi alinhado o pivô estratégico da arquitetura de auditoria constitucional e a fundação de um novo produto: o **Vitalia SPEC Kit (v0.0.1)**. 
 
 O componente `sdd_judge` é promovido de um script CLI frágil (baseado em chamadas REST externas, buffers artificiais de 400 tokens e truncamentos cegos de VRAM) para um **Sub-Agente Especialista de Primeira Classe** operando nativamente dentro da IDE Antigravity, com capacidade de contexto massiva (1M–2M tokens) e raciocínio de fronteira.
@@ -88,6 +108,16 @@ Com a injeção da Constituição integral e documentos volumosos (10k–50k tok
 - **Scaffold Puro:** O repositório `vitalia-spec-kit` nasce leve, focado nas especificações e nos componentes essenciais, consumindo o runtime do kit global instalado em `~/.vitalia/` via `install-project`.
 
 ---
+
+
+---
+
+### Decisão 10: Padronização Obrigatória de Schemas JSON em OpenAPI 3.0 (Gemini Compliant)
+- **Causa Raiz do Erro 400:** O dialeto de Structured Outputs da Google GenAI REST API (Gemini) e os compiladores de gramática modernos rejeitam meta-campos clássicos do JSON Schema Draft-07 como `$schema`, `title` e `additionalProperties: false`.
+- **Regra Contratual:** Todo e qualquer schema formal de entidade ou validação no Vitalia SPEC Kit deve ser escrito estritamente em **OpenAPI 3.0 limpo** (apenas `type`, `properties`, `required`, `items`, `description`, `enum`).
+- **Separação de Preocupações:**
+  - Instâncias de dados em runtime (ex: `.vitalia/feature.json`) são JSONs planos com chaves de configuração, NUNCA esquemas.
+  - Esquemas de validação vivem exclusivamente em diretórios de schemas (`source/src/schemas/` ou `source/config/schemas/`).
 
 ## 2. Rastro de Pesquisa e Grounding (P03)
 

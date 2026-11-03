@@ -1,4 +1,4 @@
-# agents_catalog.yaml | Vitalia SDD v0.6.0 | 20-10-2026 09:50(GMT-04:00)
+# agents_catalog.yaml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
 # Catálogo completo dos agentes especialistas do ecossistema Vitalia SDD (FR-008, FR-009)
 
 schema_type:    "agents_catalog"
@@ -6,6 +6,30 @@ schema_version: "0.6.0"
 description:    "Catálogo completo dos agentes especialistas do ecossistema Vitalia SDD"
 
 agents:
+  # Sub-Agente SDD Constitutional Judge (status: active)
+  - id:          "sdd-judge"
+    name:        "SDD Constitutional Judge"
+    emoji:       "⚖️"
+    status:      "active"
+    gates:       ["specify", "plan", "tasks", "converge"]
+    command:     "/vitalia-judge"
+    role:        "Auditoria constitucional adversarial e guardrail do pipeline SDD"
+    model_hint:  "frontier"
+    sub_agents: []
+    data_inputs:
+      - type:    "feature_graph"
+    data_outputs:
+      - type:    "inspection_report"
+        format:  "markdown"
+        path:    "specs/{feature}/Relatório de Inspeção - {phase}.md"
+    queue_key:   "vitalia:agents:sdd-judge"
+    hitl_required: true
+    description: |
+      Auditor adversarial de primeira classe nativo na IDE Antigravity.
+      Executa inspeção constitucional massiva contra P00 a P20 via Sanduíche Constitucional,
+      Inverted Chain-of-Thought e Matriz de Confronto 1-a-1, emitindo relatório físico
+      com pausa mandatória para aprovação humana soberana.
+
   # Agente com workflow executável em extensions/ (status: active)
   - id:          "medical-gate"
     name:        "Medical Gate"
