@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
-# install-project | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
-# Ativa o Vitalia Kit num projeto específico.
-# Uso: bash ~/.vitalia/bin/install-project
+# install-project | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
+# Ativa o Vitalia Kit num projeto específico de forma desacoplada de Redis e Docker.
+# Uso: vitalia-install-project ou bash ~/.vitalia-spec-kit/bin/install-project
 # Executar a partir da raiz do projeto.
 
 set -euo pipefail
 
 # ─────────────────────────────────────────────────────────────
-# CARREGAMENTO DE LIBS COM FAIL-FAST (FR-016)
+# CARREGAMENTO DE LIBS COM FAIL-FAST
 # ─────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_DIR="${SCRIPT_DIR}/lib"
 
-for lib in logger.sh env_manager.sh agent_preserver.sh redis_detector.sh git_storage_manager.sh; do
+for lib in logger.sh env_manager.sh agent_preserver.sh git_storage_manager.sh; do
     if [ -f "${LIB_DIR}/${lib}" ]; then
         # shellcheck source=/dev/null
         source "${LIB_DIR}/${lib}"
     else
-        echo "❌ Biblioteca ${lib} não encontrada. Kit desatualizado. Execute o kit-bootstrap.sh." >&2
+        echo "❌ Biblioteca ${lib} não encontrada em ${LIB_DIR}. Execute kit-bootstrap.sh." >&2
         exit 1
     fi
 done
 
-KIT_DIR="${VITALIA_KIT_DIR:-${HOME}/.vitalia}"
+KIT_DIR="${VITALIA_KIT_DIR:-${HOME}/.vitalia-spec-kit}"
 PROJECT_DIR="${PWD}"
 VITALIA_DIR="${PROJECT_DIR}/.vitalia"
 MEMORY_DIR="${VITALIA_DIR}/memory"
@@ -32,13 +32,13 @@ ENV_FILE="${PROJECT_DIR}/.env"
 if [ -f "${KIT_DIR}/VERSION" ]; then
     VERSION="$(cat "${KIT_DIR}/VERSION")"
 else
-    VERSION="0.6.0"
+    VERSION="0.0.1"
 fi
 
 # ─────────────────────────────────────────────────────────────
 echo ""
 echo "╔══════════════════════════════════════════════════╗"
-echo "║      Vitalia Kit v${VERSION} — Ativação de Projeto       ║"
+echo "║      Vitalia SPEC Kit v${VERSION} — Ativação de Projeto   ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo "📂 Projeto: $(basename "${PROJECT_DIR}")"
 echo "📦 Kit: ${KIT_DIR} (${VERSION})"
@@ -49,19 +49,16 @@ echo ""
 # ─────────────────────────────────────────────────────────────
 log_step "1" "Estrutura .vitalia/..."
 mkdir -p "${VITALIA_DIR}/memory/session"
-mkdir -p "${VITALIA_DIR}/memory/data_storage"
+mkdir -p "${VITALIA_DIR}/memory/data_storage/context"
 
-# feature.json vazio
+# feature.json inicial
 if [ ! -f "${VITALIA_DIR}/feature.json" ]; then
     echo '{"feature_directory": ""}' > "${VITALIA_DIR}/feature.json"
 fi
 
-# extensions.yml (template padrão)
+# extensions.yml
 if [ ! -f "${VITALIA_DIR}/extensions.yml" ]; then
-    if [ -f "${KIT_DIR}/templates/extensions.yml.example" ]; then
-        cp "${KIT_DIR}/templates/extensions.yml.example" "${VITALIA_DIR}/extensions.yml" 2>/dev/null || true
-    else
-        cat > "${VITALIA_DIR}/extensions.yml" << 'YAML'
+    cat > "${VITALIA_DIR}/extensions.yml" << 'YAML'
 # .vitalia/extensions.yml — Hooks do projeto
 hooks:
   before_specify: []
@@ -75,34 +72,26 @@ hooks:
   before_implement: []
   after_implement: []
 YAML
-    fi
 fi
 
 log_ok ".vitalia/ inicializado com sucesso"
 
 # ─────────────────────────────────────────────────────────────
-# PASSO 2: Configuração de Ambiente (.env) e Redis (FR-010, FR-016, FR-017)
+# PASSO 2: Configuração de Ambiente (.env) Desacoplado
 # ─────────────────────────────────────────────────────────────
-log_step "2" "Configuração de Ambiente (.env) e Redis..."
-
-# S1-S7: Garante variáveis essenciais sem duplicar nem sobrescrever
+log_step "2" "Configuração de Ambiente (.env)..."
 manage_kit_env "${ENV_FILE}" "${KIT_DIR}"
 
-# Detecção e probe resiliente de Redis com sanitização de credenciais
-detect_redis "${ENV_FILE}"
-
 # ─────────────────────────────────────────────────────────────
-# PASSO 3: Configurar repositórios de memória (FR-011, FR-016)
+# PASSO 3: Configurar repositórios de memória (Opcional)
 # ─────────────────────────────────────────────────────────────
 log_step "3" "Repositórios de memória..."
 
 SESSION_REPO=""
 DATA_REPO=""
 
-echo "   Os dados de sessão e dados gerados são armazenados em repositórios"
-echo "   Git separados para versionamento e sincronização multi-máquina."
-echo ""
 if [ -t 0 ]; then
+    echo "   Os dados de sessão e dados gerados podem ser sincronizados via Git."
     read -r -p "   URL SSH do repositório de SESSÃO (Enter para pular): " SESSION_REPO || true
     read -r -p "   URL SSH do repositório de DADOS (Enter para pular): " DATA_REPO || true
 fi
@@ -114,13 +103,12 @@ setup_data_repo "${MEMORY_DIR}" "${DATA_REPO}"
 # PASSO 4: Selecionar integrações
 # ─────────────────────────────────────────────────────────────
 log_step "4" "Integrações..."
-echo "   Selecione quais integrações instalar:"
-echo ""
 
 INSTALL_AGY="S"
 INSTALL_GEMINI_CLI="n"
 
 if [ -t 0 ]; then
+    echo "   Selecione quais integrações instalar:"
     read -r -p "   [ ] Antigravity IDE (.agents/skills/)? [S/n]: " choice_agy || true
     INSTALL_AGY="${choice_agy:-S}"
 
@@ -129,7 +117,7 @@ if [ -t 0 ]; then
 fi
 
 # ─────────────────────────────────────────────────────────────
-# PASSO 5: Gerar shims e sincronizar AGENTS.md (FR-008, FR-009, FR-016)
+# PASSO 5: Gerar shims e sincronizar AGENTS.md
 # ─────────────────────────────────────────────────────────────
 log_step "5" "Gerando shims e integrando agentes..."
 
@@ -138,37 +126,19 @@ AGENTS_DIR="${PROJECT_DIR}/.agents/skills"
 
 if [[ "${INSTALL_AGY}" =~ ^[Ss]$ ]]; then
     mkdir -p "${AGENTS_DIR}"
-
-    # Limpeza segura de skills órfãs descontinuadas e remoção de duplicatas
     mkdir -p "${AGENTS_DIR}/.trash"
 
-    # 1. Expurgar compulsoriamente pastas com prefixo duplicado (vitalia-vitalia-*)
     for dup_dir in "${AGENTS_DIR}"/vitalia-vitalia-*; do
         if [ -d "${dup_dir}" ]; then
-            log_warn "Removendo skill duplicada/corrompida para .trash: $(basename "${dup_dir}")"
+            log_warn "Removendo skill duplicada para .trash: $(basename "${dup_dir}")"
             mv "${dup_dir}" "${AGENTS_DIR}/.trash/"
         fi
     done
 
-    # 2. Mover skills órfãs cujos .toml não existem mais no Kit
-    for existing_skill_dir in "${AGENTS_DIR}"/vitalia-*; do
-        if [ -d "${existing_skill_dir}" ] && [ "$(basename "${existing_skill_dir}")" != ".trash" ]; then
-            skill_base="$(basename "${existing_skill_dir}" | sed -E 's/^(vitalia-)+//')"
-            if [ ! -f "${KIT_DIR}/extensions/${skill_base}.toml" ] && [ ! -f "${KIT_DIR}/extensions/vitalia-${skill_base}.toml" ]; then
-                log_warn "Movendo skill descontinuada para .trash: $(basename "${existing_skill_dir}")"
-                mv "${existing_skill_dir}" "${AGENTS_DIR}/.trash/"
-            fi
-        fi
-    done
-
-    # Atualiza todas as skills com manifesto SHA-256 e detecção de edições (FR-009)
     if [ -d "${KIT_DIR}/extensions" ] && [ -f "${TEMPLATE}" ]; then
         update_all_skills "${KIT_DIR}/extensions" "${AGENTS_DIR}" "${TEMPLATE}" "${VERSION}" "${KIT_DIR}"
-    else
-        log_warn "Extensões ou template de skills não encontrados em ${KIT_DIR}."
     fi
 
-    # Preservação não-destrutiva de AGENTS.md (FR-008)
     if [ -f "${KIT_DIR}/AGENTS.md" ]; then
         kit_agents_content="$(sed \
             -e "s|{{VERSION}}|${VERSION}|g" \
@@ -177,44 +147,18 @@ if [[ "${INSTALL_AGY}" =~ ^[Ss]$ ]]; then
         update_agents_md "${PROJECT_DIR}/.agents/AGENTS.md" "${kit_agents_content}"
     fi
 
-    log_ok "Antigravity IDE: skills ativas configuradas em .agents/skills/"
-fi
-
-GEMINI_DIR="${PROJECT_DIR}/.gemini/commands"
-if [[ "${INSTALL_GEMINI_CLI}" =~ ^[Ss]$ ]]; then
-    mkdir -p "${GEMINI_DIR}"
-
-    if [ -d "${KIT_DIR}/extensions" ]; then
-        for toml_file in "${KIT_DIR}/extensions/"*.toml; do
-            [ -f "${toml_file}" ] || continue
-            ext_name="$(basename "${toml_file}" .toml)"
-            cmd_file="${GEMINI_DIR}/vitalia.${ext_name}.toml"
-            sed \
-                -e "s|{{VERSION}}|${VERSION}|g" \
-                -e "s|{{VITALIA_KIT_DIR}}|${KIT_DIR}|g" \
-                "${toml_file}" > "${cmd_file}"
-            log_ok "vitalia.${ext_name}.toml gerado"
-        done
-    fi
-
-    log_ok "Gemini CLI: comandos instalados em .gemini/commands/"
+    log_ok "Antigravity IDE: skills configuradas em .agents/skills/"
 fi
 
 # ─────────────────────────────────────────────────────────────
-# PASSO 6: Criar config.yml e proteger no .gitignore
+# PASSO 6: Criar config.yml e proteção compulsória no .gitignore
 # ─────────────────────────────────────────────────────────────
-log_step "6" "Finalizando configuração do projeto..."
+log_step "6" "Finalizando configuração e proteção Git (Zero Data Leak)..."
 
 cat > "${CONFIG_FILE}" << YAML
-# .vitalia/config.yml — Gerado por install-project (Vitalia Kit v${VERSION})
-# NÃO commitar este arquivo — adicionar ao .gitignore
-
+# .vitalia/config.yml — Gerado por install-project (Vitalia SPEC Kit v${VERSION})
 kit_version: "${VERSION}"
 project: "$(basename "${PROJECT_DIR}")"
-
-redis:
-  enabled: ${REDIS_ENABLED}
-  url: "${REDIS_URL}"
 
 memory:
   session_repo: "${SESSION_REPO}"
@@ -225,14 +169,16 @@ integrations:
   gemini_cli: $([[ "${INSTALL_GEMINI_CLI}" =~ ^[Ss]$ ]] && echo "true" || echo "false")
 YAML
 
-# Adicionar entradas sensíveis e efêmeras ao .gitignore se existir
-if [ -f "${PROJECT_DIR}/.gitignore" ]; then
-    for pattern in ".env" ".vitalia/config.yml" ".vitalia/memory/session/" ".vitalia/memory/data_storage/"; do
-        if ! grep -qF "${pattern}" "${PROJECT_DIR}/.gitignore"; then
-            echo "${pattern}" >> "${PROJECT_DIR}/.gitignore"
-        fi
-    done
-fi
+# FR-005 & US2: Proteção compulsória no .gitignore (cria caso inexistente)
+GITIGNORE_FILE="${PROJECT_DIR}/.gitignore"
+[ -f "${GITIGNORE_FILE}" ] || touch "${GITIGNORE_FILE}"
+
+for pattern in ".env" ".vitalia/config.yml" ".vitalia/memory/"; do
+    if ! grep -qxF "${pattern}" "${GITIGNORE_FILE}"; then
+        echo "${pattern}" >> "${GITIGNORE_FILE}"
+        log_ok "[GITIGNORE] Padrão protegido: ${pattern}"
+    fi
+done
 
 # ─────────────────────────────────────────────────────────────
 # Relatório final
@@ -242,11 +188,10 @@ echo "╔═══════════════════════�
 echo "║              ✅ Ativação concluída               ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo "   Kit: ${KIT_DIR} (v${VERSION})"
-echo "   Redis: ${REDIS_ENABLED} (${REDIS_URL})"
 [ -n "${SESSION_REPO}" ] && echo "   Sessão: ${SESSION_REPO}"
 [ -n "${DATA_REPO}" ]    && echo "   Dados: ${DATA_REPO}"
 [[ "${INSTALL_AGY}" =~ ^[Ss]$ ]] && echo "   AGY: skills em .agents/skills/"
-[[ "${INSTALL_GEMINI_CLI}" =~ ^[Ss]$ ]] && echo "   Gemini CLI: comandos em .gemini/commands/"
+echo "   Proteção Git: .vitalia/memory/ adicionado ao .gitignore"
 echo ""
 echo "   Próximo passo: /vitalia-session-start"
 echo ""

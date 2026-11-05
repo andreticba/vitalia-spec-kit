@@ -1,0 +1,6 @@
+# requirements.txt | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
+# Dependências mínimas de runtime para o Vitalia SPEC Kit (v0.0.1)
+pyyaml>=6.0.2
+jinja2>=3.1.5
+click>=8.1.7
+pytest>=8.0.0

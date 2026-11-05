@@ -1,12 +1,11 @@
-# brainstorming.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# brainstorming.toml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 # Contratos atendidos: C1, C2, C3, C4, C5, C6, C7
 # Redesign: remove {{args}} do prompt (anti-Lost in the Middle)
 # Brainstorming é o Supervisor — entry point do ciclo SDD
 description = "Protocolo socrático para estruturar features ou requisitos complexos antes da execução."
 
 [meta]
-version = "0.6.0"
-hardware_profile = "frontier"
+version = "0.0.1"
 domain_gates = []
 
 [hooks]
@@ -28,8 +27,7 @@ reads = [
 writes = []
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:brainstorming"
+preferred = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 
@@ -54,7 +52,7 @@ necessário e só encaminha ao pipeline SDD quando o consenso estiver claro.
 1. Acesse `session_context.user_input` no `guardian_json` para obter a intenção
    original do usuário.
 2. Acesse `env_summary` para compreender o estado atual da infraestrutura e do
-   projeto (Redis, venv, branch ativo).
+   projeto (filesystem, venv, branch ativo).
 3. Consulte `context_learnings` e `context_decisions` — aprendizados e decisões
    de sessões anteriores não devem ser repetidos nem contraditos.
 4. Consulte `brainstorming_intents` para verificar se a intenção dá match com

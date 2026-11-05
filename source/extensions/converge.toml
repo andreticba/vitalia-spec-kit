@@ -1,9 +1,8 @@
-# converge.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# converge.toml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 description = "Avalia o código real do repositório contra spec/plan/tasks de uma feature e reconcilia o tasks.md via Sub-Agente /vitalia-judge --mode converge."
 
 [meta]
-version = "0.6.0"
-hardware_profile = "heavy"
+version = "0.0.1"
 domain_gates = []
 model_profile = "pro"
 
@@ -25,8 +24,7 @@ routing = true
 agents = true
 
 [transport]
-preferred = "redis"
-redis_key = "vitalia:workflow:converge"
+preferred = "filesystem"
 file_path = ".vitalia/pipeline.json"
 session_shard = true
 

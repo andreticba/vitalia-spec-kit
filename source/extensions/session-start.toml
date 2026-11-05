@@ -1,9 +1,8 @@
-# session-start.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# session-start.toml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 description = "Inicia sessão de trabalho recuperando contexto completo do projeto."
 
 [meta]
-version = "0.4.0"
-hardware_profile = "lightweight"
+version = "0.0.1"
 domain_gates = []
 
 [hooks]
@@ -19,8 +18,7 @@ reads = [".vitalia/feature.json"]
 writes = []
 
 [transport]
-preferred = "redis"
-redis_key = "vitalia:workflow:session-start"
+preferred = "filesystem"
 file_path = ".vitalia/pipeline.json"
 session_shard = true
 

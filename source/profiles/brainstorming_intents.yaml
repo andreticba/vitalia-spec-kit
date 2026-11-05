@@ -1,10 +1,10 @@
-# brainstorming_intents.yaml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# brainstorming_intents.yaml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 # Catalogo de Intencoes Semanticas para Roteamento e Classificacao
 # Contratos atendidos: C6, C8, C9
 # REGRA C8: apenas dados estruturados -- zero metadados comportamentais ou prompts
 
 schema_type: "brainstorming_intents"
-schema_version: "0.6.0"
+schema_version: "0.0.1"
 
 domains:
   estrategia_produto:
@@ -14,11 +14,23 @@ domains:
     utterances:
       - "Quero criar uma nova funcionalidade no sistema"
       - "Preciso estruturar a ideia de um novo modulo"
-      - "Como podemos desenhar a arquitetura deste produto?"
+      - "Como podemos desenhar a proposta deste produto?"
       - "Quero fazer um brainstorming de produto"
       - "Preciso decidir os trade-offs desta feature"
       - "Como posso melhorar a experiencia do usuario nesta tela?"
       - "Quero propor um novo fluxo de onboarding"
+
+  arquitetura_software:
+    description: "Decisões arquiteturais estruturantes, isolamento de dependências, padrões de design, regência do Tech Lead e compliance com princípios constitucionais."
+    threshold: 0.82
+    p0_flag: false
+    utterances:
+      - "Quero definir a arquitetura de software para este subsistema"
+      - "Preciso desenhar o diagrama de componentes e fluxos técnicos"
+      - "Como desacoplar a infraestrutura externa e migrar para filesystem puro?"
+      - "Quero planejar o turno com a regência do Architect"
+      - "Quero documentar um Architecture Decision Record (ADR)"
+      - "Preciso isolar as dependências e criar um runtime idempotente"
 
   educacao_workshop:
     description: "Criacao de material didatico, estruturacao de cursos, workshops, apresentacoes academicas ou treinos."

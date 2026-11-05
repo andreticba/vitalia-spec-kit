@@ -1,9 +1,8 @@
-# spec-plan.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# spec-plan.toml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 description = "Lê o spec.md aprovado e propõe arquitetura técnica com decisões documentadas. Gera plan.md + research.md + constitution check."
 
 [meta]
-version          = "0.3.0"
-hardware_profile = "lightweight"
+version = "0.0.1"
 domain_gates     = []
 model_profile    = "pro"
 
@@ -34,8 +33,7 @@ input  = ["args", "feature_directory"]
 output = ["plan_file", "research_file", "constitution_status"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:plan"
+preferred = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 

@@ -1,4 +1,4 @@
-# constitution.yaml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# constitution.yaml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 # Schema: Dual-Index (Opção D) — O(1) lookup por domain_id e principle_id
 # Fontes: docs/rules/always-on/*.md + docs/rules/file-triggered/*.md
 #         + OWASP LLM Top 10 2025 + EU AI Act Art.12 + CMAG 2025/2026
@@ -6,7 +6,7 @@
 # Validar com: python3 -m jsonschema --instance profiles/constitution.yaml src/schemas/constitution.schema.json
 
 schema_type: "constitution"
-schema_version: "0.6.0"
+schema_version: "0.0.1"
 
 # ─── ÍNDICE PRIMÁRIO: domain_id → [principle_id, ...] ────────────────────────
 domain_index:

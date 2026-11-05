@@ -1,9 +1,8 @@
-# spec-tasks.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# spec-tasks.toml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 description = "Converte o plan.md aprovado em tasks.md com tarefas atômicas T001 [P] [US1], fases estruturadas e MVP scope explícito."
 
 [meta]
-version          = "0.3.0"
-hardware_profile = "lightweight"
+version = "0.0.1"
 domain_gates     = []
 model_profile    = "flash"
 
@@ -30,8 +29,7 @@ input  = ["args", "feature_directory"]
 output = ["tasks_file", "task_count", "mvp_task_count"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:tasks"
+preferred = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 

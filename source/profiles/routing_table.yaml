@@ -1,10 +1,10 @@
-# routing_table.yaml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# routing_table.yaml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 # Mapa canônico: intenção do usuário → slash command Vitalia SDD
 # Lido por: vitalia-route.toml via guardian_context.py
 # Adaptador: RoutingTableAdapter (schema_type: routing_table)
 
 schema_type: "routing_table"
-schema_version: "0.6.0"
+schema_version: "0.0.1"
 
 agents:
   # ── CICLO DE SESSÃO ──────────────────────────────────────────────────────────
@@ -329,3 +329,20 @@ agents:
       - "skill-evaluation"
       - "otimizar workflow"
     description: "Analisa histórico da sessão para identificar gargalos e recomendar melhorias."
+
+  - id: "architect"
+    name: "Vitalia Architect"
+    command: "/vitalia-architect"
+    emoji: "🏛️"
+    gates: ["route"]
+    priority: 1
+    patterns:
+      - "arquiteto"
+      - "architect"
+      - "decisão arquitetural"
+      - "regência"
+      - "tech lead"
+      - "governança"
+      - "condução técnica"
+      - "planejamento de turno"
+    description: "Regência do Tech Lead e Arquiteto de Soluções — consolida planos de turno, compliance constitucional e transições técnicas."

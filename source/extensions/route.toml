@@ -1,11 +1,10 @@
-# route.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# route.toml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 # Contratos atendidos: C1, C10, C11, C12, C14, toml_workflow_contracts.md
 # vitalia-route é o despachante oficial do Kit (especialistas do catálogo e SDD)
 description = "Roteamento inteligente de intents do usuario com confirmacao e handoff local deterministico."
 
 [meta]
-version = "0.6.0"
-hardware_profile = "lightweight"
+version = "0.0.1"
 domain_gates = []
 
 [hooks]
@@ -26,8 +25,7 @@ reads = [
 writes = []
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:route"
+preferred = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = false
 

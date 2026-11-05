@@ -81,9 +81,8 @@ ensure_env_file() {
             printf "%s\n" "${template_content}" > "${env_file}"
         else
             cat << 'EOF' > "${env_file}"
-# .env | Vitalia SDD Kit
+# .env | Vitalia SPEC Kit v0.0.1
 VITALIA_ENVIRONMENT=development
-REDIS_URL=redis://localhost:6379/0
 EOF
         fi
         log_ok "[CRIADO] ${env_file} inicializado a partir do template"
@@ -155,9 +154,6 @@ manage_kit_env() {
 
     # VITALIA_ENVIRONMENT (padrão: development)
     ensure_env_var "VITALIA_ENVIRONMENT" "development" "${env_file}" "Ambiente de execução do Vitalia Kit"
-
-    # REDIS_URL unificado (FR-017: redis://localhost:6379/0)
-    ensure_env_var "REDIS_URL" "redis://localhost:6379/0" "${env_file}" "Instância Redis local para estado e cache"
 
     # VITALIA_KIT_DIR (apenas se especificado)
     if [ -n "${kit_dir_val}" ]; then

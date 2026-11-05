@@ -1,9 +1,8 @@
-# spec-implement.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# spec-implement.toml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 description = "Executa rigorosamente o tasks.md aprovado, verificando checklists antes de iniciar, marcando [X] ao concluir cada task e validando Acceptance Scenarios ao final."
 
 [meta]
-version          = "0.3.0"
-hardware_profile = "heavy"   # pode precisar de tool calling para escrever arquivos
+version = "0.0.1"
 domain_gates     = []
 model_profile    = "flash"
 
@@ -33,8 +32,7 @@ input  = ["args", "feature_directory"]
 output = ["tasks_completed", "tasks_failed", "acceptance_passed"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:implement"
+preferred = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 

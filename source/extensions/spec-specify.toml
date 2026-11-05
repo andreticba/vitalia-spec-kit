@@ -1,9 +1,8 @@
-# spec-specify.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# spec-specify.toml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 description = "Traduz o pedido do usuário em spec.md formal com prioridades, FR-xxx/SC-xxx, Given/When/Then e auto-validação por checklist."
 
 [meta]
-version          = "0.3.0"
-hardware_profile = "lightweight"
+version = "0.0.1"
 domain_gates     = []
 model_profile    = "pro"
 
@@ -28,8 +27,7 @@ input  = ["args"]
 output = ["feature_directory", "spec_file", "checklist_file"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:specify"
+preferred = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 

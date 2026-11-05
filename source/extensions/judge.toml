@@ -1,9 +1,8 @@
-# judge.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 23:25(GMT-04:00)
+# judge.toml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
 description = "Auditoria constitucional adversarial nativa na IDE Antigravity com Sanduíche Constitucional, Inverted CoT e aprovação HITL soberana."
 
 [meta]
-version          = "0.0.1"
-hardware_profile = "lightweight"
+version = "0.0.1"
 domain_gates     = []
 model_profile    = "pro"
 
@@ -29,8 +28,7 @@ input  = ["args"]
 output = ["verdict_file", "verdict_status"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:judge"
+preferred = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 

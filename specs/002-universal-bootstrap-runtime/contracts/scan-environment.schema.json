@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "description": "Contrato OpenAPI 3.0 puro para diagnóstico de ambiente desacoplado do Vitalia SPEC Kit",
+  "required": [
+    "status",
+    "project_root",
+    "has_env",
+    "runtime_isolated_ok",
+    "issues"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "HEALTHY",
+        "DEGRADED",
+        "CRITICAL"
+      ],
+      "description": "Estado consolidado da integridade do ambiente"
+    },
+    "project_root": {
+      "type": "string",
+      "description": "Caminho absoluto da raiz do projeto ativo"
+    },
+    "has_env": {
+      "type": "boolean",
+      "description": "Indica a presença de arquivo de configuração de variáveis .env"
+    },
+    "runtime_isolated_ok": {
+      "type": "boolean",
+      "description": "Indica se o interpretador Python isolado em ~/.vitalia-spec-kit/.venv está operacional"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de não-conformidades detectadas no filesystem"
+    }
+  }
+}
