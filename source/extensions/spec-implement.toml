@@ -39,8 +39,6 @@ session_shard = true
 
 [guardian]
 yaml_sources = ["constitution"]
-guardian_profile = "gp_spec-implement"
-
 prompt = """
 ## User Input
 

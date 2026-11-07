@@ -1,0 +1,261 @@
+# grounding_domains.yaml | Vitalia SPEC Kit v0.0.1 | 06-11-2026 22:55:00(GMT-04:00)
+# Dicionário canônico de domínios que exigem verificação externa obrigatória (P03).
+# Lido por: hooks/guardian_context.py (schema_type: grounding_domains)
+# NÃO edite grounding-domains-local.yaml — é artefato gerado na sessão, não fonte.
+
+schema_type: "grounding_domains"
+schema_version: "0.0.1"
+last_catalog_review: "06-11-2026 22:55:00(GMT-04:00)"
+default_validity_days: 90
+
+domains:
+  - id: "provedores_de_ia"
+    name: "Modelos e APIs de IA de Fronteira"
+    description: "Nomes de modelos vigentes, janelas de contexto, depreciações, pricing de tokens e endpoints de inferência (Google Gemini, Anthropic Claude, OpenAI)."
+    scope: "global"
+    trigger: "blocking"
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-02-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 90
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://ai.google.dev/gemini-api/docs/models/gemini"
+      source_type: "official_vendor_docs"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Validação da família Gemini 2.5 (Flash e Pro) como padrão ativo de fronteira. Purga de Ollama local."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://ai.google.dev/gemini-api/docs/models/gemini"
+        verified_by: "session_20261106_2255"
+        summary: "Atualização para modelos de fronteira v0.0.1; purga de Ollama local."
+    authoritative_sources:
+      - "https://ai.google.dev/gemini-api/docs/models/gemini"
+      - "https://docs.anthropic.com/en/docs/about-claude/models"
+      - "https://platform.openai.com/docs/models"
+
+  - id: "python_packages"
+    name: "Ecossistema e Pacotes Python"
+    description: "Versões de dependências, compatibilidade com Python >=3.10, changelogs, breaking changes e avisos de segurança no PyPI."
+    scope: "global"
+    trigger: "blocking"
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-02-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 90
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://pypi.org"
+      source_type: "package_repository"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Validação de dependências essenciais: pyyaml, jinja2, pytest, jsonschema."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://pypi.org"
+        verified_by: "session_20261106_2255"
+        summary: "Revisão e pinagem mínima para ambiente virtual isolado (.venv)."
+    authoritative_sources:
+      - "https://pypi.org"
+      - "https://github.com/advisories"
+
+  - id: "web_technologies"
+    name: "Tecnologias Web, Frontend e Estilização"
+    description: "Padrões de HTML5 semântico, Vanilla CSS moderno (tokens, CSS Grid, Flexbox, glassmorphism), bundlers (Vite), SEO e boas práticas de acessibilidade."
+    scope: "global"
+    trigger: "warning"
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-05-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 180
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://developer.mozilla.org/en-US/docs/Web/CSS"
+      source_type: "standards_documentation"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Definição de Vanilla CSS moderno e Vite como padrão de excelência visual sem dependência forçada de Tailwind."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://developer.mozilla.org/en-US/docs/Web/CSS"
+        verified_by: "session_20261106_2255"
+        summary: "Inclusão formal de padrões web modernos no kit."
+    authoritative_sources:
+      - "https://developer.mozilla.org"
+      - "https://vitejs.dev"
+      - "https://web.dev"
+
+  - id: "external_apis"
+    name: "APIs Externas e Protocolos de Integração"
+    description: "Contratos de endpoints RESTful, GraphQL, gRPC, fluxos de autenticação (OAuth 2.0 / OIDC), rate limiting e webhooks."
+    scope: "global"
+    trigger: "blocking"
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-02-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 90
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://www.rfc-editor.org/rfc/rfc6749"
+      source_type: "standards_rfc"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Padronização de contratos OpenAPI 3.0 e fluxos OAuth2/JWT."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://www.rfc-editor.org/rfc/rfc6749"
+        verified_by: "session_20261106_2255"
+        summary: "Definição de contratos de API sem amarras com brokers legados."
+    authoritative_sources:
+      - "https://spec.openapis.org/oas/latest.html"
+      - "https://www.rfc-editor.org"
+
+  - id: "security_practices"
+    name: "Segurança de Aplicação e Vulnerabilidades (CVE)"
+    description: "Vulnerabilidades conhecidas, CVEs, diretrizes OWASP Top 10 e OWASP Top 10 for LLM Applications 2025."
+    scope: "global"
+    trigger: "blocking"
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-01-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 60
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://owasp.org/www-project-top-10-for-large-language-model-applications"
+      source_type: "security_standard"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Alinhamento com OWASP Top 10 LLM 2025: injeção de prompt, vazamento de dados sensíveis e design inseguro."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://owasp.org/www-project-top-10-for-large-language-model-applications"
+        verified_by: "session_20261106_2255"
+        summary: "Inclusão de verificações de segurança em nível de oráculo Guardian."
+    authoritative_sources:
+      - "https://owasp.org"
+      - "https://nvd.nist.gov"
+      - "https://cve.mitre.org"
+
+  - id: "regulations_compliance"
+    name: "Regulações, Privacidade e Compliance Legal"
+    description: "LGPD (Lei 13.709/2018), GDPR, HIPAA Security Rule e EU AI Act. Regras para tratamento de dados pessoais (PII) e de saúde (PHI)."
+    scope: "global"
+    trigger: "blocking"
+    constitution_principles: ["P07", "P09", "P17"]
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+      source_type: "legislation"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Revisão dos artigos 11 e 14 da LGPD sobre consentimento e dados sensíveis de saúde."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+        verified_by: "session_20261106_2255"
+        summary: "Calibração dos princípios P07 e P09 na constituição."
+    authoritative_sources:
+      - "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+      - "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
+      - "https://www.hhs.gov/hipaa"
+      - "https://artificialintelligenceact.eu"
+
+  - id: "cloud_services"
+    name: "Serviços Cloud, Infraestrutura e Custos"
+    description: "Modelos de precificação de nuvem (AWS, GCP, Cloudflare), arquiteturas serverless, limites de quotas, SLAs e storage distribuído."
+    scope: "global"
+    trigger: "warning"
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-02-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 90
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://cloud.google.com/pricing"
+      source_type: "cloud_pricing"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Validação de modelos de computação sob demanda e precificação de buckets/CDN."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://cloud.google.com/pricing"
+        verified_by: "session_20261106_2255"
+        summary: "Atualização de parâmetros de custos para decisões arquiteturais."
+    authoritative_sources:
+      - "https://aws.amazon.com/pricing"
+      - "https://cloud.google.com/pricing"
+      - "https://www.cloudflare.com/plans"
+
+  - id: "scientific_claims"
+    name: "Afirmações Científicas e Revisão de Literatura"
+    description: "Citações científicas, evidências empíricas, dosagens, biomarcadores e revisões sistemáticas (PRISMA)."
+    scope: "global"
+    trigger: "blocking"
+    constitution_principles: ["P03", "P09"]
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-05-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 180
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://pubmed.ncbi.nlm.nih.gov"
+      source_type: "scientific_indexer"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Rigor estrito em citações com links verificáveis (HTTP 200) e identificador DOI."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://pubmed.ncbi.nlm.nih.gov"
+        verified_by: "session_20261106_2255"
+        summary: "Blindagem de alegações médicas sob o princípio P03."
+    authoritative_sources:
+      - "https://pubmed.ncbi.nlm.nih.gov"
+      - "https://europepmc.org"
+      - "https://www.cochranelibrary.com"
+
+  - id: "clinical_safety"
+    name: "Segurança Clínica e Protocolos de Saúde Humana"
+    description: "Ranges de biomarcadores, contraindicações médicas, suporte à decisão clínica e salvaguarda HITL obrigatória."
+    scope: "global"
+    trigger: "blocking"
+    constitution_principles: ["P00", "P09", "P14"]
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://www.who.int/publications"
+      source_type: "global_health_authority"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Exigência de validação por profissional habilitado para recomendações clínicas diretas."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://www.who.int/publications"
+        verified_by: "session_20261106_2255"
+        summary: "Inviolabilidade do princípio P00 (Human Wellbeing First) e P09."
+    authoritative_sources:
+      - "https://www.who.int"
+      - "https://www.ms.gov.br"
+
+  - id: "software_architecture"
+    name: "Engenharia de Software e Padrões Arquiteturais"
+    description: "Padrões de design estrutural baseados em componentes atômicos e coesos utilizando SRP (Single Responsibility Principle), Clean Architecture, contratos OpenAPI 3.0 / JSON Schema puros, baixo acoplamento e alta testabilidade."
+    scope: "global"
+    trigger: "warning"
+    last_verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html"
+      source_type: "engineering_authority"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Adoção de componentes desacoplados escritos utilizando SRP (Single Responsibility Principle) e contratos formais como padrão canônico do kit."
+    update_history:
+      - verified_at: "06-11-2026 22:55:00(GMT-04:00)"
+        url: "https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html"
+        verified_by: "session_20261106_2255"
+        summary: "Formalização do padrão de componentes atômicos orientados a SRP no kit v0.0.1."
+    authoritative_sources:
+      - "https://blog.cleancoder.com"
+      - "https://martinfowler.com"
+      - "https://refactoring.guru"

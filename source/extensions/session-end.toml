@@ -29,8 +29,6 @@ session_shard = true
 
 [guardian]
 yaml_sources = ["constitution"]
-guardian_profile = "gp_session-end"
-
 prompt = """
 ## User Input
 

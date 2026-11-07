@@ -40,8 +40,6 @@ session_shard = true
 
 [guardian]
 yaml_sources = ["constitution", "grounding_domains"]
-guardian_profile = "gp_spec-plan"
-
 prompt = """
 
 

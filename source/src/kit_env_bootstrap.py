@@ -8,7 +8,7 @@ Responsabilidades:
 2. Parser nativo de .env (stdlib puro, sem dependências externas).
 3. Diagnóstico de saúde do ambiente desacoplado de infraestrutura local:
    - Presença de .env no projeto
-   - Verificação da integridade do runtime isolado (~/.vitalia-spec-kit/.venv)
+   - Verificação da integridade do runtime isolado (VITALIA_KIT_DIR/.venv)
    - Purga total de dependências de sockets TCP locais (Redis 6379, Postgres 5432, Docker).
 """
 
@@ -87,6 +87,42 @@ def load_dotenv_native(env_path: Path, override: bool = False) -> Dict[str, str]
     return loaded
 
 
+def resolve_kit_dir(project_root: Optional[Path] = None) -> Path:
+    """
+    Resolve o diretório do kit global estritamente em tempo de execução:
+    1. os.environ['VITALIA_KIT_DIR']
+    2. Leitura nativa de .env do projeto hospedeiro
+    3. Diretório pai do script se estiver rodando dentro do kit instalado
+    Zero caminhos hardcoded. Lança RuntimeError se não for possível resolver.
+    """
+    # 1. os.environ
+    env_val = os.environ.get("VITALIA_KIT_DIR")
+    if env_val:
+        p = Path(env_val).expanduser().resolve()
+        if p.exists() and p.is_dir():
+            return p
+
+    # 2. .env do projeto hospedeiro
+    root = project_root or find_project_root()
+    env_file = root / ".env"
+    if env_file.exists():
+        parsed = load_dotenv_native(env_file)
+        if "VITALIA_KIT_DIR" in parsed and parsed["VITALIA_KIT_DIR"]:
+            p = Path(parsed["VITALIA_KIT_DIR"]).expanduser().resolve()
+            if p.exists() and p.is_dir():
+                return p
+
+    # 3. Diretório pai do script se executado a partir do kit global
+    script_parent = Path(__file__).resolve().parent.parent
+    if (script_parent / "extensions").is_dir() and (script_parent / "bin").is_dir():
+        return script_parent
+
+    raise RuntimeError(
+        "VITALIA_KIT_DIR não definido no ambiente nem no .env do projeto. "
+        "Defina VITALIA_KIT_DIR ou instale o kit via kit-bootstrap.sh."
+    )
+
+
 def check_environment_health(project_root: Optional[Path] = None) -> Dict[str, Any]:
     """
     Diagnostica a integridade do ambiente do projeto conforme o contrato
@@ -101,24 +137,22 @@ def check_environment_health(project_root: Optional[Path] = None) -> Dict[str, A
     env_file = project_root / ".env"
     has_env = env_file.exists() and env_file.is_file()
 
-    # Validação do runtime isolado global do kit
-    vitalia_env_dir = os.environ.get("VITALIA_KIT_DIR")
-    if vitalia_env_dir:
-        venv_python = Path(vitalia_env_dir) / ".venv" / "bin" / "python3"
-    else:
-        venv_python = Path.home() / ".vitalia-spec-kit" / ".venv" / "bin" / "python3"
-        if not venv_python.exists():
-            legacy_venv = Path.home() / ".vitalia" / ".venv" / "bin" / "python3"
-            if legacy_venv.exists():
-                venv_python = legacy_venv
-
-    runtime_isolated_ok = venv_python.exists() and os.access(venv_python, os.X_OK)
-
+    # Validação do runtime isolado global do kit via resolução dinâmica
+    kit_dir: Optional[Path] = None
     issues: List[str] = []
+
+    try:
+        kit_dir = resolve_kit_dir(project_root)
+        venv_python = kit_dir / ".venv" / "bin" / "python3"
+        runtime_isolated_ok = venv_python.exists() and os.access(venv_python, os.X_OK)
+    except RuntimeError as err:
+        runtime_isolated_ok = False
+        issues.append(str(err))
+
     if not has_env:
         issues.append("Arquivo .env ausente na raiz do projeto")
-    if not runtime_isolated_ok:
-        issues.append(f"Runtime isolado não localizado ou inoperante em {venv_python}")
+    if kit_dir and not runtime_isolated_ok:
+        issues.append(f"Runtime isolado inoperante em {kit_dir / '.venv' / 'bin' / 'python3'}")
 
     if not issues:
         status = "HEALTHY"

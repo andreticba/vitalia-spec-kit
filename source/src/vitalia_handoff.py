@@ -17,6 +17,8 @@ import uuid
 
 import jsonschema
 
+import kit_env_bootstrap
+
 # Resolução de diretórios do Kit Global
 CURRENT_DIR = Path(__file__).resolve().parent
 DEFAULT_SCHEMA_PATH = CURRENT_DIR / "schemas" / "vitalia-handoff-v1.0.0.json"
@@ -26,10 +28,10 @@ def resolve_project_root(start: Optional[Union[str, Path]] = None) -> Path:
     """
     Resolve a raiz do projeto Vitalia a partir de 'start' (ou cwd).
 
-    Regras (FR-001):
+    Regras:
     1. Se start estiver dentro de uma árvore .vitalia/, sobe para fora dela.
     2. Sobe procurando .vitalia/ de projeto (contém feature.json, config.yml ou memory/).
-    3. Ignora $HOME e o diretório do Kit Global (~/.vitalia ou VITALIA_KIT_DIR).
+    3. Ignora $HOME e o diretório do Kit Global parametrizado em VITALIA_KIT_DIR.
     4. Para ao alcançar $HOME ou a raiz do filesystem (/).
 
     Raises:
@@ -37,8 +39,11 @@ def resolve_project_root(start: Optional[Union[str, Path]] = None) -> Path:
     """
     curr = Path(start).resolve() if start is not None else Path.cwd().resolve()
     home = Path.home().resolve()
-    kit_dir_env = os.environ.get("VITALIA_KIT_DIR")
-    kit_dir = Path(kit_dir_env).resolve() if kit_dir_env else (home / ".vitalia")
+
+    try:
+        kit_dir = kit_env_bootstrap.resolve_kit_dir(curr)
+    except Exception:
+        kit_dir = None
 
     # 1. Se start estiver dentro de uma árvore .vitalia/, sobe para fora dela
     while curr.name == ".vitalia" or any(p.name == ".vitalia" for p in curr.parents):
@@ -48,12 +53,12 @@ def resolve_project_root(start: Optional[Union[str, Path]] = None) -> Path:
 
     # 2. Sobe procurando .vitalia/ de projeto
     while True:
-        # 3 & 4. Ignora $HOME e VITALIA_KIT_DIR (~/.vitalia) e para ao alcançar $HOME
-        if curr == home or curr == kit_dir:
+        # 3 & 4. Ignora $HOME e VITALIA_KIT_DIR e para ao alcançar $HOME
+        if curr == home or (kit_dir and curr == kit_dir):
             break
 
         dot_vitalia = curr / ".vitalia"
-        if dot_vitalia.is_dir() and dot_vitalia.resolve() != kit_dir:
+        if dot_vitalia.is_dir() and (kit_dir is None or dot_vitalia.resolve() != kit_dir):
             is_project = (
                 (dot_vitalia / "feature.json").exists()
                 or (dot_vitalia / "config.yml").exists()
@@ -88,7 +93,7 @@ def resolve_storage_dir(
        - Se ausente e lenient=False, lança RuntimeError com:
          "Execute novamente o install-project para inicializar data_storage e a conexão com o GitHub."
     3. Guardrail Zero Data Leak (FR-003):
-       - Se a raiz for $HOME ou o caminho final estiver sob ~/.vitalia, emite erro fatal.
+       - Se a raiz for $HOME ou o caminho final estiver sob VITALIA_KIT_DIR, emite erro fatal.
     4. Retorna <project_root>/.vitalia/memory/data_storage/handoffs (criando handoffs se necessário).
     """
     try:
@@ -99,8 +104,10 @@ def resolve_storage_dir(
         raise
 
     home = Path.home().resolve()
-    kit_dir_env = os.environ.get("VITALIA_KIT_DIR")
-    kit_dir = Path(kit_dir_env).resolve() if kit_dir_env else (home / ".vitalia")
+    try:
+        kit_dir = kit_env_bootstrap.resolve_kit_dir(project_root)
+    except Exception:
+        kit_dir = None
 
     # Guardrail Zero Data Leak: raiz nunca pode ser $HOME
     if project_root.resolve() == home:
@@ -119,14 +126,15 @@ def resolve_storage_dir(
     storage_dir = data_storage / "handoffs"
     resolved_storage = storage_dir.resolve()
 
-    # Guardrail Zero Data Leak: caminho final não pode estar sob kit_dir (~/.vitalia)
-    try:
-        resolved_storage.relative_to(kit_dir)
-        raise RuntimeError(
-            "Violação Zero Data Leak: tentativa de acessar storage global em ~/.vitalia."
-        )
-    except ValueError:
-        pass
+    # Guardrail Zero Data Leak: caminho final não pode estar sob kit_dir
+    if kit_dir:
+        try:
+            resolved_storage.relative_to(kit_dir)
+            raise RuntimeError(
+                f"Violação Zero Data Leak: tentativa de acessar storage global em {kit_dir}."
+            )
+        except ValueError:
+            pass
 
     storage_dir.mkdir(parents=True, exist_ok=True)
     return storage_dir

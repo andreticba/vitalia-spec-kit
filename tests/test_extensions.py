@@ -12,6 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 EXT_DIR = REPO_ROOT / "source" / "extensions"
 
 EXPECTED_EXTENSIONS = [
+    "analyze.toml",
     "architect.toml",
     "brainstorming.toml",
     "converge.toml",
@@ -26,12 +27,12 @@ EXPECTED_EXTENSIONS = [
     "spec-tasks.toml",
 ]
 
-def test_all_12_canonical_extensions_exist():
-    """Valida se todas as 12 extensões canônicas estão presentes."""
+def test_all_13_canonical_extensions_exist():
+    """Valida se todas as 13 extensões canônicas estão presentes."""
     present = [f.name for f in EXT_DIR.glob("*.toml")]
     for expected in EXPECTED_EXTENSIONS:
         assert expected in present, f"Extensão canônica faltante: {expected}"
-    assert len(present) == 12, f"Devem existir exatamente 12 extensões, mas foram encontradas {len(present)}"
+    assert len(present) == 13, f"Devem existir exatamente 13 extensões, mas foram encontradas {len(present)}"
 
 def test_all_extensions_parse_and_conform():
     """Valida sintaxe TOML e regras de governança da Spec 002."""

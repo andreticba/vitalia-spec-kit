@@ -1,59 +1,90 @@
-# brainstorming_intents.yaml | Vitalia SPEC Kit v0.0.1 | 04-11-2026 20:30(GMT-04:00)
-# Catalogo de Intencoes Semanticas para Roteamento e Classificacao
-# Contratos atendidos: C6, C8, C9
-# REGRA C8: apenas dados estruturados -- zero metadados comportamentais ou prompts
+# brainstorming_intents.yaml | Vitalia SPEC Kit v0.0.1 | 06-11-2026 22:55:00(GMT-04:00)
+# Catálogo de Intenções Semânticas para Roteamento e Classificação
+# Apenas dados estruturados — zero metadados comportamentais ou prompts
 
 schema_type: "brainstorming_intents"
 schema_version: "0.0.1"
 
 domains:
   estrategia_produto:
-    description: "Concepcao de novas funcionalidades, alinhamento de roadmap, proposta de valor e trade-offs de produto."
+    description: "Concepção de novas funcionalidades, alinhamento de roadmap, proposta de valor, trade-offs e definição de MVP."
     threshold: 0.80
     p0_flag: false
     utterances:
       - "Quero criar uma nova funcionalidade no sistema"
-      - "Preciso estruturar a ideia de um novo modulo"
+      - "Preciso estruturar a ideia de um novo módulo"
       - "Como podemos desenhar a proposta deste produto?"
       - "Quero fazer um brainstorming de produto"
       - "Preciso decidir os trade-offs desta feature"
-      - "Como posso melhorar a experiencia do usuario nesta tela?"
+      - "Como posso melhorar a experiência do usuário nesta tela?"
       - "Quero propor um novo fluxo de onboarding"
+      - "Qual o escopo mínimo viável (MVP) para esta entrega?"
 
   arquitetura_software:
-    description: "Decisões arquiteturais estruturantes, isolamento de dependências, padrões de design, regência do Tech Lead e compliance com princípios constitucionais."
+    description: "Decisões arquiteturais estruturantes, componentes atômicos orientados a SRP, contratos tipados, isolamento de dependências e Clean Architecture."
     threshold: 0.82
     p0_flag: false
     utterances:
       - "Quero definir a arquitetura de software para este subsistema"
       - "Preciso desenhar o diagrama de componentes e fluxos técnicos"
-      - "Como desacoplar a infraestrutura externa e migrar para filesystem puro?"
+      - "Como organizar o código em componentes desacoplados com responsabilidade única (SRP)?"
       - "Quero planejar o turno com a regência do Architect"
       - "Quero documentar um Architecture Decision Record (ADR)"
       - "Preciso isolar as dependências e criar um runtime idempotente"
+      - "Como desacoplar a infraestrutura externa e operar em filesystem puro?"
 
-  educacao_workshop:
-    description: "Criacao de material didatico, estruturacao de cursos, workshops, apresentacoes academicas ou treinos."
-    threshold: 0.78
+  engenharia_web_frontend:
+    description: "Desenvolvimento de interfaces web modernas, Vanilla CSS rico, tokens de design, layouts responsivos, Vite e SEO."
+    threshold: 0.80
     p0_flag: false
     utterances:
-      - "Crie uma apresentacao sobre o kit para a universidade"
-      - "Preciso de um roteiro de workshop tecnico"
-      - "Como estruturar uma aula pratica sobre este tema?"
-      - "Desenvolva um plano de ensino ou treinamento"
-      - "Monte um material didatico sobre arquitetura de software"
-      - "Quero criar um curso sobre desenvolvimento com IA"
-      - "Preciso de slides para uma palestra academica"
+      - "Quero criar uma interface web moderna e atraente"
+      - "Como implementar um design system usando Vanilla CSS e glassmorphism?"
+      - "Preciso estruturar o frontend usando Vite e componentes desacoplados"
+      - "Como melhorar o SEO e a hierarquia semântica HTML desta página?"
+      - "Desenvolva uma tela rica com micro-animações e tipografia profissional"
 
-  saude_clinica:
-    description: "Sistemas medicos, manipulacao de dados de pacientes, algoritmos de suporte a decisao clinica e privacidade."
+  infraestrutura_devops:
+    description: "Automação de ambientes, shims de sistema, pipelines de CI/CD, isolamento de virtualenv e esteiras de instalação."
+    threshold: 0.82
+    p0_flag: false
+    utterances:
+      - "Como automatizar o bootstrap do ambiente em máquinas novas?"
+      - "Preciso configurar pipelines de CI/CD para executar os testes"
+      - "Como garantir que o virtualenv seja 100% isolado do sistema host?"
+      - "Quero estruturar a esteira de instalação átomo a átomo"
+      - "Como gerar shims parametrizados no diretório ~/.local/bin?"
+
+  seguranca_compliance:
+    description: "Análise de vulnerabilidades, conformidade LGPD/HIPAA/GDPR, sanitização de inputs, Zero Data Leak e auditoria de código."
     threshold: 0.85
     p0_flag: true
     utterances:
-      - "Desenvolver modulo de prontuario ou dados de saude"
-      - "Integracao com exames ou biomarcadores"
-      - "Analise de dados medicos ou diagnosticos"
-      - "Sistema para uso por profissionais de saude em clinica"
-      - "Tratamento de dados sensiveis de pacientes (LGPD/HIPAA)"
-      - "Quero adicionar recomendacao de intensidade de treino"
-      - "Preciso registrar frequencia cardiaca e calcular zonas de esforco"
+      - "Preciso auditar o sistema contra vulnerabilidades do OWASP Top 10"
+      - "Como garantir que os logs não vazem PII ou credenciais?"
+      - "Quero avaliar a conformidade com as regras da LGPD e HIPAA"
+      - "Como sanitizar os inputs e blindar os contratos de API?"
+      - "Preciso implementar isolamento de dados com Zero Data Leak"
+
+  educacao_workshop:
+    description: "Criação de material didático, estruturação de cursos, workshops técnicos, apresentações acadêmicas ou roteiros de treinamento."
+    threshold: 0.78
+    p0_flag: false
+    utterances:
+      - "Crie uma apresentação técnica sobre a arquitetura do kit"
+      - "Preciso de um roteiro detalhado para um workshop prático"
+      - "Como estruturar uma aula sobre componentes desacoplados e SRP?"
+      - "Desenvolva um plano de ensino para capacitação em SDD"
+      - "Monte um tutorial passo a passo para novos desenvolvedores"
+
+  saude_clinica:
+    description: "Sistemas médicos, prontuários, biomarcadores clínicos, suporte à decisão diagnóstica e salvaguarda HITL obrigatória (P09)."
+    threshold: 0.85
+    p0_flag: true
+    utterances:
+      - "Desenvolver módulo de prontuário eletrônico ou dados clínicos"
+      - "Integração com exames laboratoriais ou biomarcadores"
+      - "Algoritmo de triagem ou suporte à decisão médica"
+      - "Sistema para uso por profissionais de saúde em clínica"
+      - "Tratamento de dados sensíveis de pacientes (LGPD Art. 11/HIPAA)"
+      - "Quero adicionar recomendação de dosagem ou frequência terapêutica"

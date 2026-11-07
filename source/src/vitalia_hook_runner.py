@@ -55,15 +55,14 @@ def get_machine_id() -> str:
     return hashlib.sha256(platform.node().encode()).hexdigest()[:32]
 
 
-def resolve_kit_dir() -> str:
-    """Descobre o diretório do Vitalia SPEC Kit global com fallbacks canônicos."""
-    env_val = os.environ.get("VITALIA_KIT_DIR", "").strip()
-    if env_val:
-        return env_val.rstrip("/")
-    unified_dir = Path.home() / ".vitalia-spec-kit"
-    if unified_dir.exists():
-        return str(unified_dir)
-    return str(Path.home() / ".vitalia")
+def resolve_kit_dir(cwd: Optional[str] = None) -> str:
+    """Descobre o diretório do Vitalia SPEC Kit global via kit_env_bootstrap sem hardcodes."""
+    try:
+        p_root = Path(cwd) if cwd else None
+        return str(kit_env_bootstrap.resolve_kit_dir(p_root))
+    except Exception as err:
+        print(f"[Hook Runner] Erro ao resolver VITALIA_KIT_DIR: {err}", file=sys.stderr)
+        sys.exit(1)
 
 
 def resolve_feature_dir(cwd: str) -> str:

@@ -217,8 +217,17 @@ update_all_skills() {
     local extensions_dir="${1:-}"
     local skills_dir="${2:-}"
     local template_file="${3:-}"
-    local version="${4:-0.6.0}"
-    local kit_dir="${5:-~/.vitalia}"
+    local version="${4:-0.0.1}"
+    local kit_dir="${5:-${VITALIA_KIT_DIR:-}}"
+
+    if [ -z "${kit_dir}" ] && [ -f ".env" ]; then
+        kit_dir="$( (grep -E '^[[:space:]]*VITALIA_KIT_DIR=' .env || true) | head -n 1 | cut -d '=' -f2- | tr -d '"' | tr -d "'" | xargs)"
+    fi
+
+    if [ -z "${kit_dir}" ]; then
+        log_error "update_all_skills: VITALIA_KIT_DIR não definido no ambiente nem no .env"
+        return 1
+    fi
 
     if [ ! -d "${extensions_dir}" ] || [ ! -f "${template_file}" ]; then
         log_error "update_all_skills: diretório de extensões ou template ausente"
@@ -234,7 +243,10 @@ update_all_skills() {
 
         # Extrai descrição do TOML com fallback defensivo
         local desc
-        desc="$(grep -E '^[[:space:]]*description[[:space:]]*=' "${toml_file}" | head -n 1 | sed -E 's/^[[:space:]]*description[[:space:]]*=[[:space:]]*["'"'"']?//; s/["'"'"'][[:space:]]*$//')"
+        desc="$( (grep -E '^[[:space:]]*description[[:space:]]*=' "${toml_file}" || true) | head -n 1 | cut -d '=' -f2- | tr -d '"' | tr -d "'" | xargs)"
+        if [ -z "${desc}" ]; then
+            desc="$( (grep -E '^[[:space:]]*title[[:space:]]*=' "${toml_file}" || true) | head -n 1 | cut -d '=' -f2- | tr -d '"' | tr -d "'" | xargs)"
+        fi
         [ -z "${desc}" ] && desc="Comando ${ext_name} do Vitalia Kit."
 
         # Renderiza template

@@ -25,14 +25,14 @@
 2. **Separação de Preocupações:** Confie no campo `prompt` de cada comando como guia daquele momento específico (se o comando manda "pausar e perguntar", não aja sozinho). Confie no `guardian_json` como a regra do ambiente daquele comando.
 3. **Grounding e Verificação (P03):** Atividades como citações científicas, bibliotecas de código ou domínios médicos exigem delegação rigorosa e pesquisa fundamentada. NUNCA cite versões ou links sem teste prévio (HTTP 200).
 4. **Numeração Sequencial de Specs:** Toda feature neste repositório segue estritamente o padrão `specs/<NNN>-<slug>/` com 3 dígitos zero-padded.
-5. **Topologia source/:** Todo código Python, perfil YAML, schema JSON ou extensão TOML desenvolvido neste repositório reside em `source/` e é espelhado no kit unificado (`~/.vitalia-spec-kit/`).
+5. **Topologia source/:** Todo código Python, perfil YAML, schema JSON ou extensão TOML desenvolvido neste repositório reside em `source/` e é instalado no kit global (`{{VITALIA_KIT_DIR}}`).
 6. **Desativação de CLI Legado (SDD-Judge Nativo na IDE):** NUNCA execute comandos CLI do script legado `sdd_judge.py` no terminal. Quando qualquer workflow solicitar a validação adversarial do SDD-Judge, execute a auditoria **diretamente na IDE como Sub-Agente**, aplicando o Sanduíche Constitucional, Inverted CoT e emitindo o Relatório de Inspeção físico com pausa mandatória para aprovação humana (HITL soberano).
-7. **Isolamento de Runtime e Git (P11):** O kit opera sobre o interpretador Python isolado em `~/.vitalia-spec-kit/.venv` sem containers locais (Redis/Postgres). Todo artefato de sessão é gravado em `.vitalia/memory/` e rigorosamente mantido fora do Git do projeto hospedeiro via `.gitignore`.
+7. **Isolamento de Runtime e Git (P11):** O kit opera sobre o interpretador Python isolado em `{{VITALIA_KIT_DIR}}/.venv` sem containers locais (Redis/Postgres). Todo artefato de sessão é gravado em `.vitalia/memory/` e rigorosamente mantido fora do Git do projeto hospedeiro via `.gitignore`.
 
 ## Localização do Kit
 
 ```
-vitalia-spec-kit/ (Repositório)              Kit Unificado no Sistema (~/.vitalia-spec-kit/)
+vitalia-spec-kit/ (Repositório)              Kit Global Parametrizado ({{VITALIA_KIT_DIR}})
 ├── source/                                 ├── bin/
 │   ├── bin/          ────────────────────► ├── extensions/
 │   ├── extensions/   ────────────────────► ├── profiles/
@@ -42,4 +42,4 @@ vitalia-spec-kit/ (Repositório)              Kit Unificado no Sistema (~/.vital
 └── .vitalia/         (metadados locais)
 ```
 
-**Versão:** 0.0.1 | **Kit-Global path:** `~/.vitalia-spec-kit/`
+**Versão:** {{VERSION}} | **Kit-Global path:** `{{VITALIA_KIT_DIR}}`

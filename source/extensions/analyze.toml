@@ -1,0 +1,89 @@
+# analyze.toml | Vitalia SPEC Kit v0.0.1 | 06-11-2026 23:00(GMT-04:00)
+description = "Audita a consistência entre spec/plan/tasks (after_tasks) ou valida deltas de implementação contra código real (after_implement) com classificação Git Diff em 3 camadas e pausa HITL soberana."
+
+[meta]
+version = "0.0.1"
+domain_gates = []
+model_profile = "pro"
+
+[hooks]
+before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+after  = []
+
+[tools]
+required = ["read_file", "list_dir", "grep_search", "write_file", "run_command"]
+optional = []
+
+[context]
+reads = ["specs/", "source/", "tests/", "extensions/", ".env", ".vitalia/feature.json"]
+writes = ["specs/"]
+
+[guardian]
+constitution = true
+routing = true
+agents = true
+yaml_sources = ["constitution", "grounding_domains"]
+
+[transport]
+preferred = "filesystem"
+file_path = ".vitalia/pipeline.json"
+session_shard = true
+
+prompt = """
+## User Input
+
+```text
+{{args}}
+```
+
+# /vitalia-analyze — O Auditor de Consistência e Verificador de Código
+
+---
+
+## Propósito
+
+Realizar a auditoria de consistência estática e semântica de especificações ou deltas de código na IDE Antigravity.
+Opera de forma read-only sobre o código de produção, gerando relatórios de inspeção semântica com verificação de breaking changes e exigindo aprovação humana soberana (HITL).
+
+---
+
+## Modos de Operação (--mode=<fase>)
+
+O comando analisa o argumento recebido ou deduz o modo com base no estado da feature ativa em `.vitalia/feature.json` ou `specs/`:
+
+1. **`after_tasks` (Modo Pré-Implementação):**
+   - Inspeciona a tríade documental de planejamento: `spec.md`, `plan.md` e `tasks.md`.
+   - Verifica rastreabilidade integral: cada `FR-xxx` e `SC-xxx` possui tarefas atômicas atribuídas em `tasks.md`.
+   - Identifica Requisitos Órfãos, Tasks sem correspondência na especificação e ambiguidades não resolvidas.
+   - Aplica gates de segurança caso identificados domínios regulados (`clinical_safety`, `security_practices`).
+
+2. **`after_implement` (Modo Pós-Implementação / Delta de Código):**
+   - Inspeciona os arquivos e linhas modificados na base de código através do Git (`git status`, `git diff -U0`).
+   - Executa a **Classificação em 3 Camadas** de cada arquivo e alteração detectada:
+     1. **Camada 1 (Previsto em Task):** Arquivo ou módulo diretamente previsto e mapeado em uma das tarefas `[X]` de `tasks.md`.
+     2. **Camada 2 (Adaptação Correlata Necessária):** Ajuste indispensável em módulos adjacentes ou testes provocado pelas alterações (ex: imports, types, fixtures).
+     3. **Camada 3 (Órfão Real / Desvio Não Autorizado):** Modificação em arquivo ou código sem correlação técnica com o escopo da feature.
+   - Executa a **Verificação Estática de Call-Sites e Quebra de Contratos**:
+     - Para cada função, método, classe ou endpoint modificado, busca seus usos consumidores no repositório via `grep_search`.
+     - Valida compatibilidade de aridade, parâmetros nomeados, imports e assinaturas.
+     - Sinaliza qualquer risco de quebra de contrato ou regressão funcional.
+
+---
+
+## Emissão do Relatório e Pausa HITL Soberana
+
+1. **Geração do Artefato Físico:**
+   - Salve o relatório completo em `specs/<NNN>-<slug>/Relatório de Análise e Consistência - <modo>.md` com cabeçalho canônico duplo contendo data e fuso GMT-04:00 (P04).
+   - O relatório deve detalhar a tabela de rastreabilidade, classificação Git Diff das 3 camadas, integridade dos call-sites e lista de achados categorizados (CRITICAL, WARNING, INFO).
+
+2. **Apresentação Executiva no Chat:**
+   - Exiba o resumo executivo no chat da IDE destacando:
+     - Total de alterações analisadas.
+     - Status da classificação em 3 camadas.
+     - Veredito da análise de call-sites (Aprovado / Risco de Quebra de Contrato).
+     - Link clicável para o arquivo do relatório físico.
+
+3. **Pausa Mandatória para Decisão Humana (HITL Soberano):**
+   - Pausa OBRIGATÓRIA. Não proceda automaticamente para encerramento de feature, release ou commits sem consentimento expresso do usuário.
+   - Se houver achados `CRITICAL` (Requisitos órfãos, Quebra de Contrato sem adaptação ou Arquivos da Camada 3 não justificados), informe explicitamente que a implementação está BLOQUEADA até remediação.
+"""

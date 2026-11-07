@@ -7,14 +7,16 @@
 _VITALIA_GIT_STORAGE_LOADED=1
 
 # Carrega logger se disponível
-_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if ! command -v log_ok &>/dev/null && [ -f "${_LIB_DIR}/logger.sh" ]; then
-    # shellcheck source=/dev/null
-    source "${_LIB_DIR}/logger.sh"
-else
-    log_ok()    { echo "   ✅ $*"; }
-    log_warn()  { echo "   ⚠️  $*"; }
-    log_error() { echo "   ❌ $*" >&2; }
+if ! command -v log_ok &>/dev/null; then
+    _LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "${_LIB_DIR}/logger.sh" ]; then
+        # shellcheck source=/dev/null
+        source "${_LIB_DIR}/logger.sh"
+    else
+        log_ok()    { echo "   ✅ $*"; }
+        log_warn()  { echo "   ⚠️  $*"; }
+        log_error() { echo "   ❌ $*" >&2; }
+    fi
 fi
 
 setup_git_repo() {

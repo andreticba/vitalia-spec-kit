@@ -14,6 +14,7 @@ import os
 import sys
 import json
 import yaml
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
@@ -38,17 +39,7 @@ class GuardianContextV2:
         self.kit_dir = self._resolve_kit_dir()
 
     def _resolve_kit_dir(self) -> Path:
-        env_val = os.environ.get("VITALIA_KIT_DIR", "").strip()
-        if env_val:
-            return Path(env_val).resolve()
-        unified = Path.home() / ".vitalia-spec-kit"
-        if unified.exists():
-            return unified
-        # Fallback local para source do repo
-        repo_source = Path(__file__).resolve().parent.parent.parent
-        if (repo_source / "profiles").exists():
-            return repo_source
-        return Path.home() / ".vitalia"
+        return kit_env_bootstrap.resolve_kit_dir(self.project_root)
 
     def _load_yaml(self, path: Path) -> Dict[str, Any]:
         if not path.exists():
@@ -83,27 +74,34 @@ class GuardianContextV2:
 
         sources: Dict[str, Any] = {}
 
-        # 1. Ingestão Integral da Constituição (P00–P17)
-        const_file = profiles_dir / "constitution.yaml"
-        if const_file.exists():
-            sources["constitution"] = self._load_yaml(const_file)
+        # 1. Ingestão Dinâmica de Fontes YAML declaradas ou padrão
+        yaml_sources = self.guardian_config.get("yaml_sources")
+        if not yaml_sources:
+            yaml_sources = ["constitution", "routing_table", "brainstorming_intents", "grounding_domains"]
 
-        # 2. Ingestão de Catálogos e Perfis
-        routing_file = profiles_dir / "routing_table.yaml"
-        if routing_file.exists():
-            sources["routing_table"] = self._load_yaml(routing_file)
+        now_tz = datetime.now(timezone(timedelta(hours=-4)))
 
-        intents_file = profiles_dir / "brainstorming_intents.yaml"
-        if intents_file.exists():
-            sources["brainstorming_intents"] = self._load_yaml(intents_file)
+        for src_name in yaml_sources:
+            yaml_path = profiles_dir / f"{src_name}.yaml"
+            if yaml_path.exists():
+                loaded = self._load_yaml(yaml_path)
+                # Verificação de status temporal para grounding_domains
+                if src_name == "grounding_domains" and "domains" in loaded:
+                    for d in loaded.get("domains", []):
+                        v_until = d.get("valid_until", "")
+                        if v_until:
+                            try:
+                                clean_dt = v_until.split("(")[0].strip()
+                                dt_exp = datetime.strptime(clean_dt, "%d-%m-%Y %H:%M:%S").replace(tzinfo=timezone(timedelta(hours=-4)))
+                                if now_tz > dt_exp:
+                                    d["status"] = "STALE"
+                                else:
+                                    d["status"] = "ACTIVE"
+                            except Exception:
+                                pass
+                sources[src_name] = loaded
 
-        profile_name = self.guardian_config.get("guardian_profile")
-        if profile_name:
-            prof_file = profiles_dir / f"{profile_name}.yaml"
-            if prof_file.exists():
-                sources["profile"] = self._load_yaml(prof_file)
-
-        # 3. Ingestão de Memória de Sessão (Learnings & Decisions)
+        # 2. Ingestão de Memória de Sessão (Learnings & Decisions)
         session_data_dir = self.project_root / ".vitalia" / "memory" / "session" / "data"
         sources["context_learnings"] = self._load_jsonl(session_data_dir / "learnings.jsonl")
         sources["context_decisions"] = self._load_jsonl(session_data_dir / "decisions.jsonl")
