@@ -1,0 +1,160 @@
+{
+  "type": "object",
+  "required": [
+    "description",
+    "meta",
+    "guardian",
+    "guardian_json"
+  ],
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Descricao do workflow ativo."
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "version",
+        "hardware_profile"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "hardware_profile": {
+          "type": "string",
+          "enum": [
+            "frontier"
+          ]
+        },
+        "domain_gates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "model_profile": {
+          "type": "string",
+          "enum": [
+            "flash",
+            "pro"
+          ]
+        }
+      }
+    },
+    "transport": {
+      "type": "object",
+      "required": [
+        "preferred"
+      ],
+      "properties": {
+        "preferred": {
+          "type": "string",
+          "enum": [
+            "filesystem"
+          ]
+        },
+        "file_path": {
+          "type": "string"
+        },
+        "session_shard": {
+          "type": "boolean"
+        }
+      }
+    },
+    "guardian": {
+      "type": "object",
+      "required": [
+        "yaml_sources",
+        "guardian_profile",
+        "prompt"
+      ],
+      "properties": {
+        "yaml_sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "guardian_profile": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "hardware_profile": {
+          "type": "string",
+          "enum": [
+            "frontier"
+          ]
+        }
+      }
+    },
+    "guardian_json": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "workflow",
+        "timestamp",
+        "sources",
+        "phase_guardrails",
+        "session_context",
+        "context_decisions",
+        "context_learnings",
+        "token_budget"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string"
+        },
+        "workflow": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Formato DD-MM-YYYY HH:MM:SS(GMT-04:00)."
+        },
+        "sources": {
+          "type": "object"
+        },
+        "phase_guardrails": {
+          "type": "object"
+        },
+        "phase_profiles": {
+          "type": "object"
+        },
+        "grounding_status": {
+          "type": "object"
+        },
+        "session_context": {
+          "type": "object"
+        },
+        "env_summary": {
+          "type": "object"
+        },
+        "context_decisions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "context_learnings": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "estimated_tokens": {
+          "type": "integer"
+        },
+        "token_budget": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        }
+      }
+    }
+  }
+}
+

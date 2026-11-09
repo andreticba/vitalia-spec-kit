@@ -1,9 +1,9 @@
-# agents_catalog.yaml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
-# Catálogo completo dos agentes especialistas do ecossistema Vitalia SDD (FR-008, FR-009)
+# agents_catalog.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Catálogo completo dos agentes especialistas do ecossistema Vitalia SPEC Kit (FR-009)
 
 schema_type:    "agents_catalog"
-schema_version: "0.6.0"
-description:    "Catálogo completo dos agentes especialistas do ecossistema Vitalia SDD"
+schema_version: "0.0.1"
+description:    "Catálogo completo dos agentes especialistas do ecossistema Vitalia SPEC Kit"
 
 agents:
   # Sub-Agente SDD Constitutional Judge (status: active)
@@ -22,23 +22,70 @@ agents:
       - type:    "inspection_report"
         format:  "markdown"
         path:    "specs/{feature}/Relatório de Inspeção - {phase}.md"
-    queue_key:   "vitalia:agents:sdd-judge"
     hitl_required: true
     description: |
       Auditor adversarial de primeira classe nativo na IDE Antigravity.
-      Executa inspeção constitucional massiva contra P00 a P20 via Sanduíche Constitucional,
-      Inverted Chain-of-Thought e Matriz de Confronto 1-a-1, emitindo relatório físico
+      Executa inspeção constitucional massiva contra P00 a P17 via Sanduíche Constitucional,
+      Inverted Chain-of-Thought, FMEA Mental e Matriz de Confronto 1-a-1, emitindo relatório físico
       com pausa mandatória para aprovação humana soberana.
 
-  # Agente com workflow executável em extensions/ (status: active)
+  # Sub-Agente Vitalia Researcher — Grounding de Fronteira e Contratos (status: active)
+  - id:          "research"
+    name:        "Vitalia Researcher (Grounding & Contract Verifier)"
+    emoji:       "🔬"
+    status:      "active"
+    gates:       ["brainstorming", "specify", "plan", "route"]
+    command:     "/vitalia-research"
+    role:        "Pesquisa externa com validação HTTP 200, leitura integral de páginas, checagem de depreciação temporal e análise de contrato do consumidor"
+    model_hint:  "frontier"
+    sub_agents:
+      - "vitalia-researcher"
+    data_inputs:
+      - type:    "research_query_and_components"
+    data_outputs:
+      - type:    "grounding_report"
+        format:  "markdown"
+        path:    "specs/{feature}/research.md"
+    hitl_required: false
+    description: |
+      Sub-Agente de pesquisa profunda e Grounding Temporal (P03) na Antigravity IDE.
+      Opera via define_subagent ('vitalia-researcher') ou 'self' com acesso à rede (search_web + run_command)
+      para validar URLs (HTTP 200), ler o conteúdo completo de documentações oficiais (evitando métodos
+      depreciados), inspecionar contratos do cliente (Antigravity IDE) e executar Engenharia Reversa
+      Funcional em 3 Camadas sobre componentes existentes.
+
+  # Agente Arquiteto Soberano (status: active)
+  - id:          "architect"
+    name:        "Vitalia Architect"
+    emoji:       "🏛️"
+    status:      "active"
+    gates:       ["route", "brainstorming", "session-end"]
+    command:     "/vitalia-architect"
+    role:        "Regência Arquitetural Soberana e transição de consensos para o pipeline SDD formal"
+    model_hint:  "frontier"
+    sub_agents: []
+    data_inputs:
+      - type:    "brainstorming_artifact"
+        path:    "specs/{feature}/research-brainstorming.md"
+    data_outputs:
+      - type:    "architecture_governance"
+        path:    "specs/{feature}/regencia-architect-plano-turno.md"
+        format:  "markdown"
+    hitl_required: true
+    description: |
+      Converte consensos do brainstorming em governança arquitetural soberana e specs formais do pipeline
+      SDD (spec-specify → spec-plan → spec-tasks → spec-implement). Cria ADRs e
+      documenta decisões arquiteturais.
+
+  # Especialistas Verticais de Domínio / Workflows Planejados (status: planned)
   - id:          "medical-gate"
     name:        "Medical Gate"
     emoji:       "🩺"
-    status:      "active"
+    status:      "planned"
     gates:       ["route", "session-start", "session-end", "medical_gate"]
     command:     "/vitalia-medical-gate"
     role:        "Avaliação de risco clínico e HITL médico"
-    model_hint:  "lightweight"
+    model_hint:  "frontier"
     sub_agents: []
     data_inputs:
       - type:    "spec_content"
@@ -46,14 +93,12 @@ agents:
       - type:    "risk_report"
         format:  "markdown"
         status:  "DRAFT"
-    queue_key:   "vitalia:agents:medical-gate"
     hitl_required: true
     description: |
       Avalia risco clínico de specs e implementações, verifica faixas de referência
       de biomarcadores e garante friction-for-safety em decisões médicas.
       Todo output é DRAFT até aprovação de profissional de saúde.
 
-  # Agentes Conceituais / Workflows Futuros do Kit (status: planned)
   - id:          "design-thinking"
     name:        "Design Thinking Facilitator"
     emoji:       "🎨"
@@ -61,7 +106,7 @@ agents:
     gates:       ["route", "session-start", "session-end"]
     command:     "/vitalia-design-thinking"
     role:        "Facilitador de workshops, PRDs e descoberta humana"
-    model_hint:  "lightweight"
+    model_hint:  "frontier"
     sub_agents:
       - "persona-builder"
       - "hmw-generator"
@@ -73,7 +118,6 @@ agents:
       - type:    "artifact"
         path:    "docs/design/"
         format:  "markdown"
-    queue_key:   "vitalia:agents:design-thinking"
     description: |
       Conduz workshops de Design Thinking (Duplo Diamante), elabora PRDs executivos,
       mapas de empatia, declarações HMW e personas. Serve workshops acadêmicos na UFMT
@@ -86,7 +130,7 @@ agents:
     gates:       ["route", "session-start", "session-end"]
     command:     "/vitalia-literature-curator"
     role:        "Guardião do acervo e ingestão científica"
-    model_hint:  "lightweight"
+    model_hint:  "frontier"
     sub_agents:
       - "ncbi-fetcher"
       - "openalex-downloader"
@@ -104,7 +148,6 @@ agents:
       - type:    "directory"
         path:    ".vitalia/memory/data_storage/fichamentos/"
         format:  "markdown"
-    queue_key:   "vitalia:agents:literature-curator"
     description: |
       Coleta, baixa, extrai texto completo e indexa literatura científica via EuropePMC
       (XML), OpenAlex (PDF OA), e Docling da IBM para Markdown estruturado.
@@ -117,7 +160,7 @@ agents:
     gates:       ["route", "session-end"]
     command:     "/vitalia-visual-creator"
     role:        "Geração visual híbrida e prototipação"
-    model_hint:  "heavy"
+    model_hint:  "frontier"
     sub_agents:
       - "prompt-visual-optimizer"
       - "image-backend-router"
@@ -128,32 +171,9 @@ agents:
       - type:    "directory"
         path:    ".vitalia/memory/data_storage/images/"
         format:  "webp|png"
-    queue_key:   "vitalia:agents:visual-creator"
     description: |
       Gera personas fotorrealistas, wireframes de Design Thinking e infográficos clínicos.
       Roteia automaticamente entre backend Gemini (qualidade) e Diffusers local (privacidade).
-
-  - id:          "architect"
-    name:        "Vitalia Architect"
-    emoji:       "🏛️"
-    status:      "planned"
-    gates:       ["route", "brainstorming", "session-end"]
-    command:     "/vitalia-architect"
-    role:        "Transição de consensos para o pipeline SDD formal"
-    model_hint:  "lightweight"
-    sub_agents: []
-    data_inputs:
-      - type:    "brainstorming_artifact"
-        path:    "docs/brainstorming_*.md"
-    data_outputs:
-      - type:    "spec_draft"
-        path:    "specs/"
-        format:  "markdown"
-    queue_key:   "vitalia:agents:architect"
-    description: |
-      Converte consensos do brainstorming e Design Thinking em specs formais do pipeline
-      SDD (spec-specify → spec-plan → spec-tasks → spec-implement). Cria ADRs e
-      documenta decisões arquiteturais.
 
   # Especialistas do ecossistema AI-Control (FR-009 — status: planned)
   - id:          "master-ai-control"
@@ -165,7 +185,6 @@ agents:
     role:        "Arquiteto e Maestro do Projeto"
     model_hint:  "frontier"
     sub_agents: []
-    queue_key:   "vitalia:agents:master-ai-control"
     description: |
       Arquiteto-chefe do ecossistema AI-Control. Orquestra requisitos cross-system,
       arbitra decisões técnicas e garante alinhamento estratégico da solução.
@@ -177,9 +196,8 @@ agents:
     gates:       ["route"]
     command:     "/vitalia-django-stark"
     role:        "Especialista Backend Python e Django"
-    model_hint:  "lightweight"
+    model_hint:  "frontier"
     sub_agents: []
-    queue_key:   "vitalia:agents:django-stark"
     description: |
       Especialista em arquitetura backend, Django, Django REST Framework, Celery,
       Redis, modelagem relacional PostgreSQL, autenticação e performance de APIs.
@@ -191,9 +209,8 @@ agents:
     gates:       ["route"]
     command:     "/vitalia-react-vinci"
     role:        "Especialista Frontend e UI"
-    model_hint:  "lightweight"
+    model_hint:  "frontier"
     sub_agents: []
-    queue_key:   "vitalia:agents:react-vinci"
     description: |
       Especialista em arquitetura frontend, Next.js, React, TypeScript, Tailwind CSS,
       gerenciamento de estado, acessibilidade e integração fluida com APIs backend.
@@ -205,9 +222,8 @@ agents:
     gates:       ["route"]
     command:     "/vitalia-infra-nomad"
     role:        "Especialista em DevOps e Infraestrutura"
-    model_hint:  "lightweight"
+    model_hint:  "frontier"
     sub_agents: []
-    queue_key:   "vitalia:agents:infra-nomad"
     description: |
       Guardião da infraestrutura conteinerizada, Docker Compose, redes isoladas,
       volumes persistentes, variáveis de ambiente seguras e pipelines de CI/CD.
@@ -219,9 +235,8 @@ agents:
     gates:       ["route"]
     command:     "/vitalia-cortex-analyst"
     role:        "Especialista em Dados, IA e RAG"
-    model_hint:  "heavy"
+    model_hint:  "frontier"
     sub_agents: []
-    queue_key:   "vitalia:agents:cortex-analyst"
     description: |
       Especialista em pipelines de ingestão de dados, chunking, modelos de embeddings
       locais/cloud, busca vetorial com pgvector e engenharia de contexto para LLMs.
@@ -233,9 +248,8 @@ agents:
     gates:       ["route"]
     command:     "/vitalia-figma-maestro"
     role:        "Especialista em Design System e UX"
-    model_hint:  "lightweight"
+    model_hint:  "frontier"
     sub_agents: []
-    queue_key:   "vitalia:agents:figma-maestro"
     description: |
       Arquiteto de interfaces, design tokens, micro-interações, consistência visual,
       componentes reutilizáveis e tradução de wireframes em especificações de UI.

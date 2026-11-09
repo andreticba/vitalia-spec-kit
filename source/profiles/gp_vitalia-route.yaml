@@ -1,0 +1,37 @@
+# gp_vitalia-route.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Guardian Profile para vitalia-route (Dispatcher).
+# Sem poda de contexto (no_prune: true).
+
+schema_type: "guardian_profile"
+schema_version: "0.0.1"
+workflow: "vitalia-route"
+
+hardware_profile: "frontier"
+
+tokens:
+  total_budget: 0
+  source_weights:
+    constitution: 1.0
+    routing_table: 1.0
+    brainstorming_intents: 1.0
+    agents_catalog: 1.0
+
+constitution:
+  no_prune: true
+  domains: []
+  severity_filter: ["BLOCKING", "WARNING", "INFO"]
+  principles_include: []
+
+phase_guardrails:
+  phase: "route"
+  role: "Dispatcher Oficial de Workflows Vitalia"
+  mandatory_checks:
+    - "Consultar deterministicamente a tríade: brainstorming_intents.yaml -> agents_catalog.yaml -> routing_table.yaml."
+    - "Encaminhar demandas de arquitetura de software e início do ciclo SDD para /vitalia-architect."
+    - "Exigir confirmação explícita do usuário antes de efetivar o handoff."
+
+session_context:
+  include_p0: true
+  include_active_feature: true
+  include_agents_queue: false
+  include_user_input: true

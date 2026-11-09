@@ -1,11 +1,11 @@
-# spec-implement.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
-description = "Executa rigorosamente o tasks.md aprovado, verificando checklists antes de iniciar, marcando [X] ao concluir cada task e validando Acceptance Scenarios ao final."
+# spec-implement.toml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:52(GMT-04:00)
+description = "Executa rigorosamente o tasks.md aprovado, verificando checklists antes de iniciar, comprovando Red/Green Phase na Matriz P05, marcando [X] ao concluir cada task e validando Acceptance Scenarios ao final."
 
 [meta]
-version          = "0.3.0"
-hardware_profile = "heavy"   # pode precisar de tool calling para escrever arquivos
+version          = "0.0.1"
+hardware_profile = "frontier"
 domain_gates     = []
-model_profile    = "flash"
+model_profile    = "pro"
 
 [hooks]
 before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]   # pair mode pode ser injetado aqui via extensions.yml
@@ -33,8 +33,7 @@ input  = ["args", "feature_directory"]
 output = ["tasks_completed", "tasks_failed", "acceptance_passed"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:implement"
+preferred     = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 
@@ -115,13 +114,21 @@ Para cada fase no tasks.md:
 
   Para cada task na fase:
     → Marcar como em andamento: - [/] T001 ...
-    → Executar: escrever/modificar arquivos
-    → Ao concluir: marcar - [X] T001 ...
-    → Reportar: "✅ T001: [arquivo criado/modificado]"
+    → SE a task for de TESTE ([TEST:NEW], [TEST:BUGFIX], [TEST:REFACTOR], [TEST:MIGRATION]):
+      1. Proibido escrever testes tautológicos/sintáticos (ex: apenas `assert path.is_file()`). O teste DEVE exercitar o comportamento executável e o Cenário de Falsificação declarado.
+      2. Para `[TEST:NEW]` e `[TEST:BUGFIX]`: executar o teste via `pytest` no terminal ANTES de implementar o código/fix e confirmar empiricamente que ele FALHA pelo motivo de negócio esperado (Red Phase / Bug Reproduction). Se o teste já passar sozinho antes da correção, ele é um FALSO POSITIVO e deve ser reescrito.
+      3. Para `[TEST:REFACTOR]` e `[TEST:MIGRATION]`: garantir cobertura das invariantes de preservação comportamental documentadas na Matriz de Migração do `plan.md`.
+    → SE a task for de IMPLEMENTAÇÃO / REFATORAÇÃO:
+      1. Proibido reescrever código legado cegamente omitindo comportamentos estáveis mapeados na Matriz de Migração do `plan.md`.
+      2. Respeitar estritamente a pureza dos diretórios e contratos do consumidor (ex: zero arquivos ocultos ou `.trash` em `.agents/skills/`).
+      3. Executar a bateria de testes correspondente no terminal e comprovar código de saída 0 (Green Phase).
+    → Ao concluir e comprovar em execução: marcar - [X] T001 ...
+    → Reportar: "✅ T001: [arquivo criado/modificado + resultado da execução do teste]"
 
-    ┌── Gate Pós-Task (Governança Nativa na IDE) ────────────────────────┐
+    ┌── Gate Pós-Task Adversarial (Governança Nativa na IDE) ─────────────┐
     │  Auditoria adversarial executada diretamente na IDE Antigravity     │
-    │  • Sem desvios constitucionais → prosseguir para a próxima task     │
+    │  • Verificar se os testes são comportamentais (não-rasos)           │
+    │  • Verificar se nenhum comportamento estável foi amputado           │
     │  • Desvio identificado → BLOQUEAR. Corrigir o código antes de       │
     │    marcar a task como [X] e avançar.                                 │
     └─────────────────────────────────────────────────────────────────────┘

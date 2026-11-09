@@ -1,13 +1,13 @@
-# session-end.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# session-end.toml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:52(GMT-04:00)
 description = "Encerra a sessão em 4 fases: reflexão, atualização 3-Tier, commit e shard."
 
 [meta]
-version = "0.4.0"
-hardware_profile = "lightweight"
+version = "0.0.1"
+hardware_profile = "frontier"
 domain_gates = []
 
 [hooks]
-before = []
+before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
 after = []
 
 [tools]
@@ -17,15 +17,14 @@ optional = []
 [context]
 reads = [
   ".vitalia/feature.json",
-  "{{VITALIA_KIT_DIR}}/config/schemas/learning_schema.json",
-  "{{VITALIA_KIT_DIR}}/config/schemas/decision_schema.json",
-  "{{VITALIA_KIT_DIR}}/config/schemas/grounding_domain_schema.json"
+  "{{VITALIA_KIT_DIR}}/src/schemas/learning_schema.json",
+  "{{VITALIA_KIT_DIR}}/src/schemas/decision_schema.json",
+  "{{VITALIA_KIT_DIR}}/src/schemas/grounding_domain_schema.json"
 ]
 writes = []
 
 [transport]
-preferred = "redis"
-redis_key = "vitalia:workflow:session-end"
+preferred = "filesystem"
 file_path = ".vitalia/pipeline.json"
 session_shard = true
 

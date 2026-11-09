@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "domains"
+  ],
+  "properties": {
+    "schema_type": {
+      "type": "string",
+      "enum": [
+        "dynamic_questioning"
+      ]
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "last_curated_at": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "domains": {
+      "type": "object"
+    }
+  }
+}

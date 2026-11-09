@@ -1,94 +1,73 @@
-# gp_sdd-judge.yaml | Vitalia SDD v0.6.0 | 15-09-2026 17:45(GMT-04:00)
-# Guardian Profile para o SDDJudge (LLM-as-a-Judge).
-# FONTE UNICA DE VERDADE sobre quais principios cada fase avalia.
-# Zero principios hardcoded em Python ou nos prompts. (Prevenção de Criteria Drift)
+# gp_sdd-judge.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Guardian Profile para o Sub-Agente SDD-Judge Nativo na IDE Antigravity.
+# Sem poda de contexto (no_prune: true) + Lentes Adversariais Red Team por Fase (specify, plan, tasks, after_task, clarify, converge).
 
 schema_type: "guardian_profile"
-schema_version: "0.6.0"
+schema_version: "0.0.1"
 workflow: "sdd-judge"
 
-judge_config:
-  model: "qwen2.5-coder:7b"
-  ollama_url: "http://localhost:11434/api/generate"
-  idle_timeout_seconds: 30
-  connect_timeout_seconds: 10
-  truncation:
-    default: 15000
-    after_task: 15000
+hardware_profile: "frontier"
+
+tokens:
+  total_budget: 0
+  source_weights:
+    constitution: 1.0
+    grounding_domains: 1.0
+
+constitution:
+  no_prune: true
+  domains: []
+  severity_filter: ["BLOCKING", "WARNING", "INFO"]
+  principles_include: []
+
+phase_guardrails:
+  phase: "judge"
+  role: "Juiz Constitucional Adversarial & Red Team Failure Hunter"
+  mandatory_fmea_questions:
+    - "1. Hipóteses de Ambiente Limpo (Clean Machine Assumptions): Que dependências de SO, variáveis, shells ou estados prévios este artefato assume que falharão numa máquina limpa (ex: WSL2/zsh sem estado prévio)?"
+    - "2. Auditoria Anti-Shallow Testing (P05): Os testes validam execução comportamental de caixa-preta e Cenário de Falsificação, ou são tautologias sintáticas (assert path.is_file(), assert 'string' in read_text())? Se forem rasos -> VETO BLOCKING IMEDIATO."
+    - "3. Regressão por Simplificação Indevida: Alguma refatoração ou modularização omitiu ramos funcionais estáveis do código anterior (ex: clones remotos, fallbacks de interpretador)?"
+    - "4. Violação de Contrato do Consumidor: O artefato polui diretórios estritos do cliente (ex: .trash ou .manifest em .agents/skills/) ou viola schemas OpenAPI 3.0?"
 
 phase_profiles:
   specify:
-    description: "Gate na geracao da spec.md - valida Requisitos Funcionais contra constituicao"
-    evaluation_unit: "FR"
-    extraction_pattern: "^\\s*(?:#{1,4}\\s*)?-?\\s*\\*?\\*?FR-\\d+"
-    principles_include: ["P00", "P01", "P02", "P03", "P07", "P09", "P14", "P17"]
-    constitution_domains:
-      - "PURPOSE"
-      - "GOVERNANCE"
-      - "GROUNDING"
-      - "PRIVACY_DATA_VAULT"
-      - "CLINICAL_SAFETY"
-      - "REGULATORY_COMPLIANCE"
+    description: "Gate na geracao da spec.md - valida Requisitos Funcionais, Grounding HTTP 200 e Criterios de Aceite Comportamentais"
+    evaluation_unit: "FR / SC"
+    extraction_pattern: "^\\s*(?:#{1,4}\\s*)?-?\\s*\\*?\\*?(?:FR|SC)-\\d+"
+    adversarial_focus: "Rejeitar SC-xxx não-mensuráveis ou baseados em mera existência de arquivos; exigir Grounding P03 verificado."
 
   plan:
-    description: "Gate na aprovacao do plan.md - valida Decisoes Tecnicas e ADRs"
-    evaluation_unit: "ADR"
-    extraction_pattern: "^##?#?\\s+(?:Decisao|Decisão|ADR)[:\\s]"
-    principles_include: ["P01", "P03", "P04", "P06", "P11", "P15", "P16"]
-    constitution_domains:
-      - "GOVERNANCE"
-      - "GROUNDING"
-      - "INFRASTRUCTURE"
-      - "SECRETS"
-      - "HARDWARE_AGNOSTICISM"
-      - "OBSERVABILITY"
+    description: "Gate na aprovacao do plan.md - valida Decisoes Tecnicas, Test Depth Agreement (TDA) e Matriz de Migracao"
+    evaluation_unit: "ADR / TDA / Migration Matrix"
+    extraction_pattern: "^##?#?\\s+(?:Decisao|Decisão|ADR|Test Depth|Matriz de Migração)[:\\s]"
+    adversarial_focus: "Bloquear planos sem Test Depth Agreement (TDA) explícito ou refatorações sem Matriz de Migração e Preservação Comportamental."
 
   tasks:
-    description: "Gate na geracao do tasks.md - valida atomicidade e ordem das tarefas"
+    description: "Gate na geracao do tasks.md - valida atomicidade, Modalidade P05 e Cenario de Falsificacao"
     evaluation_unit: "Task"
     extraction_pattern: "^\\s*(?:#{1,4}\\s*)?-?\\s*(?:\\[[ xX/]\\]\\s*)?T\\d+"
-    principles_include: ["P00", "P01", "P05", "P06", "P09", "P12", "P13", "P14"]
-    constitution_domains:
-      - "PURPOSE"
-      - "GOVERNANCE"
-      - "SECRETS"
-      - "AGENT_SECURITY"
-      - "CLINICAL_SAFETY"
+    adversarial_focus: "Bloquear tarefas de teste sem tag [TEST:NEW|BUGFIX|REFACTOR|MIGRATION] ou sem Cenário de Falsificação comportamental explícito."
 
   after_task:
-    description: "Gate pos-implementacao - valida Git Diff apos cada task concluida"
-    evaluation_unit: "Git Diff"
+    description: "Gate pos-implementacao - valida Git Diff, execucao real de testes e preservacao de contratos"
+    evaluation_unit: "Git Diff & Test Execution"
     extraction_pattern: null
-    principles_include: ["P05", "P06", "P07", "P08", "P09", "P12", "P15"]
-    constitution_domains:
-      - "GOVERNANCE"
-      - "SECRETS"
-      - "PRIVACY_DATA_VAULT"
-      - "AGENT_SECURITY"
-      - "CLINICAL_SAFETY"
-      - "OBSERVABILITY"
+    adversarial_focus: "Bloquear código com testes superficiais (is_file), regressões em fluxos estáveis ou poluição de diretórios de contrato."
 
   clarify:
-    description: "Gate na especificacao para auditoria de ambiguidades taxonómicas"
+    description: "Gate na especificacao para auditoria de ambiguidades taxonomicas (10 categorias ISO 29148)"
     evaluation_unit: "Requirement/Section"
-    extraction_pattern: "^\\s*(?:#{1,4}\\s*)?-?\\s*\\*?\\*?(?:FR-\\d+|Cenário|Cenario)"
-    principles_include: ["P00", "P01", "P02", "P03", "P04", "P16"]
-    constitution_domains:
-      - "PURPOSE"
-      - "GOVERNANCE"
-      - "GROUNDING"
-      - "INFRASTRUCTURE"
+    extraction_pattern: "^\\s*(?:#{1,4}\\s*)?-?\\s*\\*?\\*?(?:FR-\\d+|Cenário|Cenario|SC-\\d+)"
+    adversarial_focus: "Detectar subespecificação de contratos do cliente, lacunas de tratamento de erro em ambiente limpo e ambiguidades funcionais."
 
   converge:
-    description: "Reconciliacao quadridimensional de spec/plan/tasks vs codigo real"
-    evaluation_unit: "Feature Artifact Pair"
+    description: "Reconciliacao quadridimensional de spec/plan/tasks vs codigo real e testes executados"
+    evaluation_unit: "Feature Artifact Pair & Runtime Proof"
     extraction_pattern: null
-    principles_include: ["P00", "P01", "P02", "P03", "P04", "P05", "P06", "P11", "P15", "P16"]
-    constitution_domains:
-      - "PURPOSE"
-      - "GOVERNANCE"
-      - "GROUNDING"
-      - "INFRASTRUCTURE"
-      - "SECRETS"
-      - "HARDWARE_AGNOSTICISM"
-      - "OBSERVABILITY"
+    adversarial_focus: "Reverter [X] de qualquer tarefa cujo teste seja tautológico/sintático ou cujo comportamento falhe em execução de caixa-preta."
+
+session_context:
+  include_p0: true
+  include_active_feature: true
+  include_agents_queue: false
+  include_user_input: true

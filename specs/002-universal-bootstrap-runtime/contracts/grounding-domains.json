@@ -1,0 +1,146 @@
+{
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "last_catalog_review",
+    "default_validity_days",
+    "domains"
+  ],
+  "properties": {
+    "schema_type": {
+      "type": "string",
+      "enum": [
+        "grounding_domains"
+      ]
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "last_catalog_review": {
+      "type": "string"
+    },
+    "default_validity_days": {
+      "type": "integer"
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "scope",
+          "trigger",
+          "last_verified_at",
+          "valid_until",
+          "validity_window_days",
+          "status",
+          "last_update_source",
+          "update_history",
+          "authoritative_sources"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "trigger": {
+            "type": "string",
+            "enum": [
+              "blocking",
+              "warning",
+              "info"
+            ]
+          },
+          "last_verified_at": {
+            "type": "string"
+          },
+          "valid_until": {
+            "type": "string"
+          },
+          "validity_window_days": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "STALE",
+              "DEPRECATED"
+            ]
+          },
+          "last_update_source": {
+            "type": "object",
+            "required": [
+              "url",
+              "source_type",
+              "verified_by",
+              "machine_id",
+              "summary_of_changes"
+            ],
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "source_type": {
+                "type": "string"
+              },
+              "verified_by": {
+                "type": "string"
+              },
+              "machine_id": {
+                "type": "string"
+              },
+              "summary_of_changes": {
+                "type": "string"
+              }
+            }
+          },
+          "update_history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "verified_at",
+                "url",
+                "verified_by",
+                "summary"
+              ],
+              "properties": {
+                "verified_at": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "verified_by": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "authoritative_sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

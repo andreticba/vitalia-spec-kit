@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "required": [
+    "type",
+    "category",
+    "learning",
+    "rationale"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "learning"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "KIT",
+        "PROJETO"
+      ]
+    },
+    "learning": {
+      "type": "string"
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "machine_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    }
+  }
+}

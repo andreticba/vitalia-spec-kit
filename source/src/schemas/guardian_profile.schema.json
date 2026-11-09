@@ -1,0 +1,143 @@
+{
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "workflow",
+    "hardware_profile",
+    "tokens",
+    "constitution",
+    "phase_guardrails",
+    "session_context"
+  ],
+  "properties": {
+    "schema_type": {
+      "type": "string",
+      "enum": [
+        "guardian_profile"
+      ]
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "workflow": {
+      "type": "string"
+    },
+    "hardware_profile": {
+      "type": "string",
+      "enum": [
+        "frontier"
+      ]
+    },
+    "tokens": {
+      "type": "object",
+      "required": [
+        "total_budget",
+        "source_weights"
+      ],
+      "properties": {
+        "total_budget": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "source_weights": {
+          "type": "object"
+        }
+      }
+    },
+    "constitution": {
+      "type": "object",
+      "required": [
+        "no_prune",
+        "domains",
+        "severity_filter",
+        "principles_include"
+      ],
+      "properties": {
+        "no_prune": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "severity_filter": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "BLOCKING",
+              "WARNING",
+              "INFO"
+            ]
+          }
+        },
+        "principles_include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "phase_guardrails": {
+      "type": "object",
+      "required": [
+        "phase",
+        "role"
+      ],
+      "properties": {
+        "phase": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "mandatory_checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mandatory_fmea_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "phase_profiles": {
+      "type": "object"
+    },
+    "session_context": {
+      "type": "object",
+      "required": [
+        "include_p0",
+        "include_active_feature"
+      ],
+      "properties": {
+        "include_p0": {
+          "type": "boolean"
+        },
+        "include_active_feature": {
+          "type": "boolean"
+        },
+        "include_agents_queue": {
+          "type": "boolean"
+        },
+        "include_user_input": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
+

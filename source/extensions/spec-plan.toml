@@ -1,9 +1,9 @@
-# spec-plan.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# spec-plan.toml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:52(GMT-04:00)
 description = "Lê o spec.md aprovado e propõe arquitetura técnica com decisões documentadas. Gera plan.md + research.md + constitution check."
 
 [meta]
-version          = "0.3.0"
-hardware_profile = "lightweight"
+version          = "0.0.1"
+hardware_profile = "frontier"
 domain_gates     = []
 model_profile    = "pro"
 
@@ -13,7 +13,7 @@ after  = []
 
 [tools]
 required = ["write_file", "read_file"]
-optional = ["web_search"]
+optional = ["search_web", "run_command", "define_subagent", "invoke_subagent"]
 
 [context]
 reads  = [
@@ -34,8 +34,7 @@ input  = ["args", "feature_directory"]
 output = ["plan_file", "research_file", "constitution_status"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:plan"
+preferred     = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 
@@ -107,13 +106,12 @@ Para cada ponto técnico não definido na spec, documentar em `research.md`:
 > ⚠️ Decisões técnicas sem campo "Verificado em" são inválidas e devem ser revisadas antes do tasks.md.
 
 <grounding_rules>
-Ao preencher cada Decisão em research.md:
-NUNCA escolha uma biblioteca, framework ou serviço sem verificar versão atual em fonte autoritativa.
-NUNCA escreva "Escolhido: X porque é mais moderno/popular" sem URL de fonte verificada.
-NUNCA afirme compatibilidade de versões sem verificar em pypi.org ou documentação oficial.
-Domínios que exigem verificação: python_packages (pypi.org), external_apis (doc oficial),
-cloud_services (pricing pages), llm_models, security_practices.
-Ver regra completa: profiles/grounding_domains.yaml (via Guardian)
+Ao preencher cada Decisão em research.md e plan.md:
+1. Delegue a pesquisa externa a um Sub-Agente com acesso à rede (`define_subagent` `vitalia-researcher` ou `self` — NUNCA use o subagente `research` built-in sem rede para busca web).
+2. NUNCA escolha uma biblioteca, framework, contrato de IDE ou serviço sem verificar HTTP 200 e ler o conteúdo completo da página oficial, checando avisos de depreciação e versões mais recentes.
+3. NUNCA escreva "Escolhido: X porque é mais moderno/popular" sem URL de fonte verificada e data.
+4. Para refatorações ou adaptações arquiteturais, aplique a Engenharia Reversa Funcional em 3 Camadas: (1) Intenção de negócio pura a preservar; (2) Infraestrutura legada a purgar; (3) Contrato estrito do consumidor.
+Ver regra completa: profiles/grounding_domains.yaml e guardian_json.phase_guardrails (via Guardian).
 </grounding_rules>
 
 **Regra de escala**:
@@ -148,6 +146,18 @@ Ver regra completa: profiles/grounding_domains.yaml (via Guardian)
 
 ## Technical Decisions
 [resultado da Fase 0 — ou link para research.md]
+
+## Matriz de Migração e Preservação Comportamental (Obrigatória se alterar/refatorar componentes existentes)
+| Componente | Comportamento Existente a Preservar (Invariante de Negócio) | Acoplamento / Defeito a Remover | Contrato do Consumidor & Estratégia de Teste (`[TEST:MIGRATION]`) |
+|---|---|---|---|
+| [ex: módulo X] | [ex: fluxo funcional, fallback ou integração que deve sobreviver] | [ex: dependência legada ou bug] | [ex: execução black-box validando preservação + purga] |
+
+## Test Depth Agreement (TDA — Matriz Constitucional P05)
+Estipular para cada componente qual a modalidade e profundidade mínima de teste exigida (proibindo testes puramente sintáticos como `assert file.is_file()`):
+- **`[TEST:NEW]` (Código Novo):** TDD Red-Green-Refactor com execução funcional de caixa-preta.
+- **`[TEST:BUGFIX]` (Correção de Bug):** Bug Reproduction First — o teste DEVE reproduzir o defeito e falhar no código atual antes do fix.
+- **`[TEST:REFACTOR]` (Refatoração Pura):** Behavioral Characterization — preserva entradas/saídas antes e depois.
+- **`[TEST:MIGRATION]` (Adaptação Arquitetural):** Contract Preservation + Clean Purge — garante que comportamentos estáveis antigos sobrevivam enquanto a infraestrutura legada é purgada e as invariantes do consumidor (ex: pureza de diretórios) são respeitadas.
 
 ## Project Structure
 

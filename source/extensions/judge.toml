@@ -1,9 +1,9 @@
-# judge.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 23:25(GMT-04:00)
-description = "Auditoria constitucional adversarial nativa na IDE Antigravity com Sanduíche Constitucional, Inverted CoT e aprovação HITL soberana."
+# judge.toml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:52(GMT-04:00)
+description = "Auditoria constitucional adversarial nativa na IDE Antigravity com Sanduíche Constitucional, FMEA Mental (Red Team Failure Hunt), Inverted CoT e aprovação HITL soberana."
 
 [meta]
 version          = "0.0.1"
-hardware_profile = "lightweight"
+hardware_profile = "frontier"
 domain_gates     = []
 model_profile    = "pro"
 
@@ -29,8 +29,7 @@ input  = ["args"]
 output = ["verdict_file", "verdict_status"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:judge"
+preferred     = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 
@@ -56,7 +55,7 @@ Principais Cláusulas Bloqueantes:
 - P02 (GOVERNANCE): User-Centric Validation & Impact Declaration — Impacto e mitigação documentados.
 - P03 (GROUNDING): External Verification Protocol — Afirmações e versões com HTTP 200 comprovado.
 - P04 (INFRASTRUCTURE): Timestamp & GMT-04:00 Integrity — Cabeçalho duplo e fuso imutável.
-- P05 (GOVERNANCE): Test-First Development (TDD Inviolável) — Red phase obrigatória antes de código.
+- P05 (GOVERNANCE): Test-First Development & Behavioral Falsification Matrix — Matriz de 4 Modalidades ([TEST:NEW], [TEST:BUGFIX], [TEST:REFACTOR], [TEST:MIGRATION]), Cenário de Falsificação obrigatório e VETO BLOCKING a testes sintáticos/rasos (assert file.is_file()).
 - P06 (SECRETS): Secrets Never in Git — Segredos apenas em .env/vaults.
 - P07 (PRIVACY): Privacy by Design & Data Vault — Isolamento de PHI/PII e Zero Data Leak.
 - P08 (AGENT_SECURITY): Smart Routing & Minimum Privilege — Default-deny de ferramentas.
@@ -77,20 +76,27 @@ O sub-agente detecta a fase ativa a partir do argumento `--mode=<fase>` ou anali
 
 ---
 
-## Protocolo de Auditoria Adversarial (Inverted CoT)
+## Protocolo de Auditoria Adversarial (FMEA Mental + Inverted CoT)
 
 1. **Ingestão Documental Sob Demanda**:
-   - Utilize `view_file` para ler o artefato alvo da fase (`spec.md`, `plan.md`, `tasks.md` etc.).
+   - Utilize `read_file` para ler o artefato alvo da fase (`spec.md`, `plan.md`, `tasks.md` ou código implementado).
    - Inspecione arquivos de apoio existentes (`requirements.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/`).
-2. **Inverted Chain-of-Thought (Critique-First, Verdict-Last)**:
+   - Consulte `guardian_json.phase_guardrails` e `guardian_json.phase_profiles` para os critérios específicos da fase.
+2. **Modo Adversarial Mandatório — Red Team Failure Hunt (FMEA Mental)**:
+   - É terminantemente PROIBIDO atuar como espelho complacente ("Teatro de Conformidade"). Antes de cogitar aprovar qualquer artefato ou código, tente ativamente refutá-lo respondendo obrigatoriamente no relatório às 4 questões FMEA:
+     a) **Hipóteses de Ambiente Limpo (Clean Machine Assumptions):** Que dependências de SO, variáveis de ambiente, shells (ex: zsh/WSL2) ou estados prévios este artefato/código assume que falharão numa instalação limpa?
+     b) **Auditoria Anti-Shallow Testing (P05):** Os testes ou tarefas de teste validam execução comportamental de caixa-preta com Cenário de Falsificação explícito e modalidade (`[TEST:NEW|BUGFIX|REFACTOR|MIGRATION]`), ou limitam-se a verificar existência sintática de arquivos/strings (`assert path.is_file()`, `assert "str" in read_text()`)? *(Se detectar teste superficial/tautológico → emita veredito `BLOCK` sumário).*
+     c) **Regressão por Simplificação Indevida:** Em refatorações ou migrações arquiteturais, alguma funcionalidade, fallback ou fluxo estável do componente anterior foi silenciosamente amputado (confrontar com a Matriz de Migração do `plan.md`)?
+     d) **Violação de Contrato do Consumidor:** O artefato polui diretórios estritos do cliente (ex: criar `.trash` ou `.vitalia-manifest` dentro de `.agents/skills/` na Antigravity IDE) ou viola schemas OpenAPI 3.0 limpos?
+3. **Inverted Chain-of-Thought (Critique-First, Verdict-Last)**:
    - É terminantemente PROIBIDO emitir o veredito antecipado.
    - Primeiro, extraia citações factuais de linha de cada evidência.
-   - Segundo, desenvolva a análise crítica individual de cada evidência contra a regra constitucional.
-   - Terceiro, construa a Matriz de Confronto 1-a-1 confrontando os princípios bloqueantes aplicáveis.
+   - Segundo, responda às 4 questões do FMEA Mental e desenvolva a análise crítica individual de cada evidência contra a regra constitucional.
+   - Terceiro, construa a Matriz de Confronto 1-a-1 confrontando todos os princípios aplicáveis.
    - Quarto e por último, consolide o veredito: `PASS`, `WARN` ou `BLOCK`.
-3. **Geração Física do Relatório de Inspeção**:
+4. **Geração Física do Relatório de Inspeção**:
    - Persista obrigatoriamente o artefato: `specs/{feature}/Relatório de Inspeção - {fase}.md`.
-4. **Gate HITL Soberano (Pausa Mandatória)**:
+5. **Gate HITL Soberano (Pausa Mandatória)**:
    - Suspenda a execução no chat e solicite expressamente o consentimento do desenvolvedor.
    - Nenhuma fase é considerada aprovada sem o HITL soberano explícito.
 
@@ -98,8 +104,10 @@ O sub-agente detecta a fase ativa a partir do argumento `--mode=<fase>` ou anali
 
 ## Checklist Imperativo de Conformidade e Recency (Fechamento do Sanduíche)
 
-- [ ] Todos os princípios bloqueantes (P00-P20) foram confrontados linha a linha na Matriz 1-a-1?
+- [ ] As 4 questões do FMEA Mental (Ambiente Limpo, Anti-Shallow Testing, Preservação em Migração, Contrato do Consumidor) foram respondidas com rigor adversarial?
+- [ ] Todos os princípios constitucionais foram confrontados linha a linha na Matriz 1-a-1 sem poda?
 - [ ] Foram extraídas citações textuais de linhas antes do cômputo do veredito?
+- [ ] Qualquer teste baseado apenas em presença sintática (`is_file()`) ou sem Cenário de Falsificação foi vetado com `BLOCK`?
 - [ ] O artefato físico `Relatório de Inspeção - {fase}.md` foi salvo no disco?
 - [ ] Todos os schemas inspecionados são OpenAPI 3.0 limpos (sem `$schema`, sem `title` raiz)?
 - [ ] A execução foi pausada para exigir o aceite do desenvolvedor humano?

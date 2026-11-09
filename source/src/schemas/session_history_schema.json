@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "required": [
+    "machine_name",
+    "machine_id",
+    "last_sync",
+    "task",
+    "steps",
+    "next_step",
+    "status"
+  ],
+  "properties": {
+    "machine_name": {
+      "type": "string"
+    },
+    "machine_id": {
+      "type": "string"
+    },
+    "mode": {
+      "type": "string"
+    },
+    "last_sync": {
+      "type": "string"
+    },
+    "task": {
+      "type": "string"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_step": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    }
+  }
+}

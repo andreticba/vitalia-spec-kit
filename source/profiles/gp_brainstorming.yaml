@@ -1,0 +1,38 @@
+# gp_brainstorming.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Guardian Profile para o workflow brainstorming (Supervisor).
+# Sem poda de contexto (no_prune: true) + Lente de Fase para Concepção, Grounding e Engenharia Reversa.
+
+schema_type: "guardian_profile"
+schema_version: "0.0.1"
+workflow: "brainstorming"
+
+hardware_profile: "frontier"
+
+tokens:
+  total_budget: 0
+  source_weights:
+    constitution: 1.0
+    brainstorming_intents: 1.0
+    dynamic_questioning: 1.0
+    agents_catalog: 1.0
+
+constitution:
+  no_prune: true
+  domains: []
+  severity_filter: ["BLOCKING", "WARNING", "INFO"]
+  principles_include: []
+
+phase_guardrails:
+  phase: "brainstorming"
+  role: "Nexus Socrático & Supervisor de Concepção"
+  mandatory_checks:
+    - "STOP -> SCAN -> ASK (máx 3 perguntas) -> WAIT: proibido gerar spec/plan/tasks/código durante a ideação."
+    - "Engenharia Reversa Funcional em 3 Camadas para refatorações: (1) Intenção de Negócio Pura a preservar; (2) Infraestrutura Legada a purgar; (3) Contrato Estrito do Consumidor (ex: Antigravity IDE)."
+    - "Grounding de Fronteira via Sub-Agente (vitalia-researcher / self com rede): validar links (HTTP 200), ler páginas completas, detectar métodos depreciados e registrar Tabela de Proveniência."
+    - "Classificação preliminar da natureza da mudança para a Matriz de Testes P05 ([TEST:NEW], [TEST:BUGFIX], [TEST:REFACTOR], [TEST:MIGRATION])."
+
+session_context:
+  include_p0: true
+  include_active_feature: true
+  include_agents_queue: true
+  include_user_input: true

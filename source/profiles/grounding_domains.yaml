@@ -1,0 +1,269 @@
+# grounding_domains.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:48(GMT-04:00)
+schema_type: "grounding_domains"
+schema_version: "0.0.1"
+last_catalog_review: "07-11-2026 21:00:00(GMT-04:00)"
+default_validity_days: 90
+
+domains:
+  - id: "provedores_de_ia"
+    name: "Modelos de Fronteira e Orquestração Híbrida de IA"
+    description: "Modelos vigentes de fronteira (Google Gemini 3.x: gemini-3.6-flash, gemini-3.1-pro-preview; Anthropic Claude; OpenAI), janelas de contexto, pricing, políticas de retry (Exponential Backoff) e arquiteturas híbridas em projetos assistidos (triagem local PII/PHI via Ollama/Open WebUI + geração analítica cloud)."
+    scope: "global"
+    trigger: "blocking"
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "05-02-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 90
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://ai.google.dev/gemini-api/docs/models/gemini"
+      source_type: "official_vendor_docs"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Alinhamento com a família Gemini 3.x (gemini-3.6-flash e gemini-3.1-pro-preview) e padrões de orquestração híbrida (Cloud + Local Triage) do AI-Control."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://ai.google.dev/gemini-api/docs/models/gemini"
+        verified_by: "session_20261107_2100"
+        summary: "Calibração para modelos Gemini 3.x e roteamento inteligente Flash/Pro."
+    authoritative_sources:
+      - "https://ai.google.dev/gemini-api/docs/models/gemini"
+      - "https://docs.anthropic.com/en/docs/about-claude/models"
+      - "https://platform.openai.com/docs/models"
+      - "https://github.com/ollama/ollama/blob/main/docs/api.md"
+
+  - id: "python_packages"
+    name: "Ecossistema Python, Django 6.x, ASGI & Data Vault"
+    description: "Compatibilidade com Python 3.10–3.14+, Django 6.1+, Daphne (ASGI), Django REST Framework (~3.18), SimpleJWT, drf-spectacular (OpenAPI 3.0), Django Channels 4 + channels-redis, Celery 5.6+, pgvector (0.5+), django-crypto-fields (1.0+), cryptography, Pydantic v2, pytest/pytest-django e pacotes core do kit (pyyaml, jinja2, jsonschema)."
+    scope: "global"
+    trigger: "blocking"
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "05-02-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 90
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://pypi.org"
+      source_type: "package_repository"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Incorporação da stack Python 3.14 / Django 6.1 ASGI, DRF, Channels, Celery, pgvector e django-crypto-fields utilizada no AI-Control."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://docs.djangoproject.com/en/stable/releases/"
+        verified_by: "session_20261107_2100"
+        summary: "Validação da stack full-stack Python/Django 6.1 e dependências do kit isolado."
+    authoritative_sources:
+      - "https://pypi.org"
+      - "https://docs.djangoproject.com"
+      - "https://www.django-rest-framework.org"
+      - "https://drf-spectacular.readthedocs.io"
+      - "https://docs.celeryq.dev"
+      - "https://channels.readthedocs.io"
+
+  - id: "web_technologies"
+    name: "Frontend Moderno: Next.js 16, React 19, TypeScript 5 & TailwindCSS v4"
+    description: "Arquitetura App Router e Turbopack (Next.js 16+), React 19, TypeScript 5 (tsc --noEmit), TailwindCSS v4 (@tailwindcss/postcss, tailwind-merge, clsx), separação Server-State (TanStack React Query v5 com SSR factory e Optimistic Updates) vs Client-State (Redux Toolkit), validação com Zod, Axios com interceptors concorrentes (isRefreshing) e geração de tipos via openapi-typescript v7."
+    scope: "global"
+    trigger: "blocking"
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "05-02-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 90
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://nextjs.org/docs"
+      source_type: "official_framework_docs"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Alinhamento com a stack frontend do AI-Control: Next.js 16.4+, React 19.2, TailwindCSS v4, TanStack Query v5, Redux Toolkit 2.11, Zod e openapi-typescript."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://nextjs.org/docs"
+        verified_by: "session_20261107_2100"
+        summary: "Substituição do perfil genérico por Next.js 16, React 19, TailwindCSS v4 e TanStack Query v5."
+    authoritative_sources:
+      - "https://nextjs.org/docs"
+      - "https://react.dev"
+      - "https://tailwindcss.com/docs"
+      - "https://tanstack.com/query/latest/docs"
+      - "https://redux-toolkit.js.org"
+      - "https://openapi-ts.dev"
+      - "https://zod.dev"
+
+  - id: "external_apis"
+    name: "APIs Externas, Gateways Omnichannel, WebSockets & Contratos OpenAPI 3.0"
+    description: "Contratos OpenAPI 3.0 estritos (drf-spectacular <-> openapi-typescript), autenticação JWT Stateless com Refresh Rotation, WebSockets ASGI em tempo real, integração com Gateways Omnichannel/WhatsApp (Evolution API v2, webhooks MESSAGES_UPSERT/CONNECTION_UPDATE, despacho síncrono com falha atômica HTTP 502/400 e descarte O(1) de presence.update)."
+    scope: "global"
+    trigger: "blocking"
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "05-02-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 90
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://spec.openapis.org/oas/v3.0.3.html"
+      source_type: "standards_rfc"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Inclusão de padrões de integração com Evolution API v2, WebSockets Django Channels e sincronização tipada OpenAPI 3.0."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://spec.openapis.org/oas/v3.0.3.html"
+        verified_by: "session_20261107_2100"
+        summary: "Padronização de contratos REST/WebSocket e gateways de mensageria."
+    authoritative_sources:
+      - "https://spec.openapis.org/oas/latest.html"
+      - "https://doc.evolution-api.com"
+      - "https://www.rfc-editor.org/rfc/rfc6749"
+
+  - id: "security_practices"
+    name: "Segurança de Aplicação, Data Vault Criptográfico & OWASP (API/LLM)"
+    description: "Criptografia em repouso de PII/PHI (AES-256 e RSA via django-crypto-fields), Blind Indexing com SHA-256 para busca exata sem decriptação, criptografia simétrica de contexto em memória no Redis, mascaramento de credenciais em logs (SensitiveLogMaskingMiddleware: apikey=[REDACTED]), proteção condicional de schemas em produção (OWASP API9:2023) e diretrizes OWASP Top 10 for LLM Applications 2025."
+    scope: "global"
+    trigger: "blocking"
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "06-01-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 60
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://owasp.org/www-project-top-10-for-large-language-model-applications"
+      source_type: "security_standard"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Incorporação dos padrões Data Vault (AES-256/RSA + Blind Indexing SHA-256), mascaramento de logs e OWASP API9:2023 do AI-Control."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://owasp.org/API-Security/"
+        verified_by: "session_20261107_2100"
+        summary: "Alinhamento com OWASP API Security 2023 e OWASP LLM Top 10 2025."
+    authoritative_sources:
+      - "https://owasp.org/www-project-top-10-for-large-language-model-applications"
+      - "https://owasp.org/API-Security/"
+      - "https://nvd.nist.gov"
+      - "https://cve.mitre.org"
+
+  - id: "regulations_compliance"
+    name: "Regulações, Privacidade, Trilha Imutável e Compliance Legal"
+    description: "LGPD (Lei 13.709/2018 — Art. 11, 14 e 18), GDPR, HIPAA Security Rule e EU AI Act (Art. 12 e 14). Governança de consentimento explícito (ConsentLog), concessão temporária de acesso (DataAccessGrant) e trilha de auditoria imutável (AuditLog)."
+    scope: "global"
+    trigger: "blocking"
+    constitution_principles: ["P07", "P09", "P17"]
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "07-11-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+      source_type: "legislation"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Integração dos modelos de conformidade ConsentLog, DataAccessGrant e AuditLog imutável."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+        verified_by: "session_20261107_2100"
+        summary: "Calibração dos princípios P07, P09 e P17 com mecanismos auditáveis de consentimento."
+    authoritative_sources:
+      - "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+      - "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
+      - "https://www.hhs.gov/hipaa"
+      - "https://artificialintelligenceact.eu"
+
+  - id: "cloud_services"
+    name: "Infraestrutura Conteinerizada de Aplicação, Banco Vetorial & Cloud"
+    description: "Orquestração Docker Compose para projetos full-stack (PostgreSQL 16 com pgvector, Redis particionado por DB lógico, Evolution API, Ollama com GPU pass-through), além de precificação, quotas e SLAs em provedores Cloud (GCP, AWS, Cloudflare)."
+    scope: "global"
+    trigger: "warning"
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "05-02-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 90
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://github.com/pgvector/pgvector"
+      source_type: "infrastructure_docs"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Distinção clara: o Kit SDD opera em filesystem puro, enquanto aplicações assistidas (ex: AI-Control) utilizam PostgreSQL 16 + pgvector e Redis particionado via Docker Compose."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://cloud.google.com/pricing"
+        verified_by: "session_20261107_2100"
+        summary: "Inclusão da topologia de containers de aplicação (pgvector:pg16, redis:alpine) e cloud pricing."
+    authoritative_sources:
+      - "https://github.com/pgvector/pgvector"
+      - "https://docs.docker.com/compose/"
+      - "https://cloud.google.com/pricing"
+      - "https://aws.amazon.com/pricing"
+
+  - id: "scientific_claims"
+    name: "Afirmações Científicas e Revisão de Literatura"
+    description: "Citações científicas, evidências empíricas, dosagens, biomarcadores e revisões sistemáticas (PRISMA)."
+    scope: "global"
+    trigger: "blocking"
+    constitution_principles: ["P03", "P09"]
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "06-05-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 180
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://pubmed.ncbi.nlm.nih.gov"
+      source_type: "scientific_indexer"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Rigor estrito em citações com links verificáveis (HTTP 200) e identificador DOI."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://pubmed.ncbi.nlm.nih.gov"
+        verified_by: "session_20261107_2100"
+        summary: "Blindagem de alegações médicas sob o princípio P03."
+    authoritative_sources:
+      - "https://pubmed.ncbi.nlm.nih.gov"
+      - "https://europepmc.org"
+      - "https://www.cochranelibrary.com"
+
+  - id: "clinical_safety"
+    name: "Segurança Clínica, Safety Gate e Transbordo HITL"
+    description: "Detecção determinística de risco clínico (CLINICAL_KEYWORDS / Safety Gate), interrupção imediata de fluxo autônomo de IA com transbordo humano (ACTIVE_HUMAN), ranges de biomarcadores e salvaguarda HITL tripla (DRAFT -> REVIEW -> ACTIVE)."
+    scope: "global"
+    trigger: "blocking"
+    constitution_principles: ["P00", "P09", "P14"]
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "07-11-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://www.who.int/publications"
+      source_type: "global_health_authority"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Inclusão do padrão Safety Gate e transbordo imediato para operador/profissional humano em conversas omnichannel."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://www.who.int/publications"
+        verified_by: "session_20261107_2100"
+        summary: "Inviolabilidade do princípio P00 e P09 com Safety Gate em tempo real."
+    authoritative_sources:
+      - "https://www.who.int"
+      - "https://www.ms.gov.br"
+
+  - id: "software_architecture"
+    name: "Engenharia de Software, RBAC 4-Tier, RAG Scoped & SRP"
+    description: "Componentes atômicos orientados a SRP (Single Responsibility Principle), Service Layer com falha atômica, governança multi-tenant RBAC Hierárquico 4-Tier (Platform -> Org -> Dept -> Project -> Squad) com Containment Rule e permissões por slug, RAG Scoped (pré-filtragem relacional antes da busca vetorial HNSW), prevenção estrita de queries N+1 (batching O(1)) e Matriz de Testes Comportamentais P05."
+    scope: "global"
+    trigger: "warning"
+    last_verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+    valid_until: "07-11-2027 21:00:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html"
+      source_type: "engineering_authority"
+      verified_by: "session_20261107_2100"
+      machine_id: "42c8e746"
+      summary_of_changes: "Consolidação dos padrões arquiteturais do AI-Control (RBAC 4-Tier, RAG Scoped, Service Layer atômica, otimização anti-N+1 O(1) e SRP)."
+    update_history:
+      - verified_at: "07-11-2026 21:00:00(GMT-04:00)"
+        url: "https://martinfowler.com/eaaCatalog/serviceLayer.html"
+        verified_by: "session_20261107_2100"
+        summary: "Integração de Service Layer, RBAC 4-Tier e RAG Scoped aos padrões de arquitetura do kit."
+    authoritative_sources:
+      - "https://blog.cleancoder.com"
+      - "https://martinfowler.com"
+      - "https://refactoring.guru"

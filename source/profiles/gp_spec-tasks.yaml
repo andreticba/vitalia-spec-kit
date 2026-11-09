@@ -1,0 +1,37 @@
+# gp_spec-tasks.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Guardian Profile para spec-tasks.
+# Sem poda de contexto (no_prune: true) + Lente de Fase para Decomposição com Cenário de Falsificação.
+
+schema_type: "guardian_profile"
+schema_version: "0.0.1"
+workflow: "spec-tasks"
+
+hardware_profile: "frontier"
+
+tokens:
+  total_budget: 0
+  source_weights:
+    constitution: 1.0
+    grounding_domains: 1.0
+
+constitution:
+  no_prune: true
+  domains: []
+  severity_filter: ["BLOCKING", "WARNING", "INFO"]
+  principles_include: []
+
+phase_guardrails:
+  phase: "tasks"
+  role: "Decompositor Atômico & Arquiteto de Falsificação"
+  mandatory_checks:
+    - "Matriz Bidimensional de Testes (P05): toda tarefa de teste DEVE declarar sua modalidade explícita: [TEST:NEW], [TEST:BUGFIX], [TEST:REFACTOR] ou [TEST:MIGRATION]."
+    - "Cenário de Falsificação Obrigatório: toda tarefa de teste em tasks.md DEVE descrever explicitamente qual comportamento de negócio, execução real ou invariante de contrato fará o teste falhar se omitido ou quebrado."
+    - "Proibição de Testes Rasos: nenhuma tarefa de teste pode ter como critério apenas assert path.is_file() ou inspeção estática de strings."
+    - "Cada linha da Matriz de Migração do plan.md deve originar uma tarefa [TEST:MIGRATION] correspondente."
+
+session_context:
+  include_p0: true
+  include_active_feature: true
+  include_agents_queue: false
+  include_user_input: true
+

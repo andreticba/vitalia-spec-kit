@@ -1,0 +1,190 @@
+{
+  "description": "Schema polimorfico de transferencia de contexto inter-agente do Vitalia SPEC Kit v0.0.1 (OpenAPI 3.0 Puro - P11).",
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "envelope",
+    "intent",
+    "session_snapshot",
+    "routing"
+  ],
+  "properties": {
+    "schema_type": {
+      "type": "string",
+      "enum": [
+        "workflow_handoff"
+      ]
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "1.0.0"
+      ]
+    },
+    "envelope": {
+      "type": "object",
+      "required": [
+        "handoff_id",
+        "created_at",
+        "ttl_seconds",
+        "source_workflow",
+        "target_workflow",
+        "direction",
+        "machine_id",
+        "status"
+      ],
+      "properties": {
+        "handoff_id": {
+          "type": "string",
+          "description": "UUID v4 unico por evento de handoff"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "ttl_seconds": {
+          "type": "integer",
+          "description": "Tempo de vida do arquivo em segundos"
+        },
+        "source_workflow": {
+          "type": "string",
+          "description": "Workflow emissor do handoff"
+        },
+        "target_workflow": {
+          "type": "string",
+          "description": "Workflow receptor do handoff"
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "forward",
+            "reverse",
+            "fallback"
+          ],
+          "description": "Direcao da transicao de contexto: forward, reverse ou fallback."
+        },
+        "machine_id": {
+          "type": "string",
+          "description": "SHA256[:8] de VITALIA_MACHINE_NAME ou hostname"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "consumed",
+            "expired"
+          ]
+        }
+      }
+    },
+    "intent": {
+      "type": "object",
+      "required": [
+        "intent_type",
+        "source_input",
+        "normalized_summary",
+        "confidence"
+      ],
+      "properties": {
+        "intent_type": {
+          "type": "string",
+          "enum": [
+            "brainstorming_to_route",
+            "route_to_brainstorming",
+            "route_dispatch",
+            "brainstorming_delegate",
+            "subagent_response",
+            "sdd_pipeline_advance",
+            "session_action"
+          ]
+        },
+        "source_input": {
+          "type": "string"
+        },
+        "normalized_summary": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "match_level": {
+          "type": "string",
+          "enum": [
+            "keyword",
+            "semantic",
+            "fallback"
+          ]
+        },
+        "match_source": {
+          "type": "string"
+        },
+        "target_command": {
+          "type": "string"
+        },
+        "detected_domain": {
+          "type": "string"
+        },
+        "domain_hint": {
+          "type": "string"
+        },
+        "pipeline_stage": {
+          "type": "string",
+          "enum": [
+            "brainstorming",
+            "specify",
+            "plan",
+            "tasks",
+            "implement",
+            "converge"
+          ]
+        },
+        "feature_context": {
+          "type": "string"
+        }
+      }
+    },
+    "session_snapshot": {
+      "type": "object",
+      "required": [
+        "active_feature",
+        "machine_id"
+      ],
+      "properties": {
+        "active_feature": {
+          "type": "string"
+        },
+        "p0": {
+          "type": "string"
+        },
+        "machine_id": {
+          "type": "string"
+        },
+        "env_summary": {
+          "type": "object"
+        }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "required": [
+        "confirmed_by_user",
+        "suggested_command",
+        "fallback_used"
+      ],
+      "properties": {
+        "confirmed_by_user": {
+          "type": "boolean"
+        },
+        "confirmation_timestamp": {
+          "type": "string"
+        },
+        "suggested_command": {
+          "type": "string"
+        },
+        "fallback_used": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

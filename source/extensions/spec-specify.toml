@@ -1,9 +1,9 @@
-# spec-specify.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# spec-specify.toml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:52(GMT-04:00)
 description = "Traduz o pedido do usuário em spec.md formal com prioridades, FR-xxx/SC-xxx, Given/When/Then e auto-validação por checklist."
 
 [meta]
-version          = "0.3.0"
-hardware_profile = "lightweight"
+version          = "0.0.1"
+hardware_profile = "frontier"
 domain_gates     = []
 model_profile    = "pro"
 
@@ -13,10 +13,12 @@ after  = []
 
 [tools]
 required = ["write_file", "read_file"]
-optional = []
+optional = ["search_web", "run_command", "define_subagent", "invoke_subagent"]
 
 [context]
-reads  = []
+reads  = [
+  "specs/*/research-brainstorming.md"
+]
 writes = [
   ".vitalia/feature.json",
   "specs/*/spec.md",
@@ -28,8 +30,7 @@ input  = ["args"]
 output = ["feature_directory", "spec_file", "checklist_file"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:specify"
+preferred     = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 
@@ -125,13 +126,12 @@ Gravar em `.vitalia/feature.json`:
    - Se não for possível verificar: marque `[NEEDS VERIFICATION: <pergunta>]`
 
   <grounding_rules>
-  Ao preencher "## Suposições Verificadas":
-  NUNCA afirme versões de pacotes, APIs ou modelos LLM sem busca externa prévia.
-  NUNCA cite URLs de memória — sempre verifique se o domínio/URL existe.
-  NUNCA use "padrão de mercado" ou "amplamente adotado" para tecnologias sem fonte verificada.
-  Domínios que exigem verificação: llm_models, python_packages, external_apis,
-  security_practices, regulations, cloud_services, scientific_claims.
-  Ver regra completa: profiles/grounding_domains.yaml
+  Ao preencher "## Suposições Verificadas" e os Critérios de Aceite:
+  1. NUNCA afirme versões de pacotes, APIs, contratos de cliente (ex: Antigravity IDE) ou modelos LLM sem busca externa prévia via Sub-Agente com acesso à rede (`define_subagent` `vitalia-researcher` ou `self` — NUNCA use o subagente `research` built-in sem rede para busca web).
+  2. NUNCA cite URLs de memória — verifique HTTP 200 real e leia o conteúdo integral da página/documentação oficial para detectar avisos de depreciação ou páginas mais recentes.
+  3. NUNCA defina Success Criteria (SC-xxx) ou Acceptance Scenarios (Given/When/Then) baseados na mera presença de arquivos ou strings estáticas; todo critério DEVE especificar o comportamento funcional observável em execução e as invariantes de pureza do contrato do consumidor.
+  4. Quando a feature envolver correção de bugs ou migração/refatoração de componentes existentes, inclua uma seção `## Comportamentos Existentes a Preservar & Defeitos a Reproduzir`.
+  Ver regra completa: profiles/grounding_domains.yaml e guardian_json.phase_guardrails.
   </grounding_rules>
 
 ### Passo 6: Validação de qualidade

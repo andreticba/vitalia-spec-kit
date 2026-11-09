@@ -1,0 +1,339 @@
+# dynamic_questioning.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:48(GMT-04:00)
+schema_type: "dynamic_questioning"
+schema_version: "0.0.1"
+last_curated_at: "06-11-2026 22:55:00(GMT-04:00)"
+
+description: >
+  Registry canônico de perguntas socráticas para o workflow de brainstorming.
+  Cada decision_point revela trade-offs arquiteturais (custo, tempo, complexidade).
+  Estruturado segundo o Princípio da Responsabilidade Única (SRP) e desacoplado
+  de serviços de infraestrutura local obsoletos (Redis, Celery, Ollama, VRAM).
+
+domains:
+
+  # ═══════════════════════════════════════════════
+  # P0 CRITICAL — Proteção de Dados, Identidade e Segurança
+  # ═══════════════════════════════════════════════
+
+  protecao_de_dados_e_privacidade:
+    description: "Regulações de privacidade: LGPD (Lei 13.709/2018), GDPR, HIPAA e soberania de dados."
+    priority: "🔴 P0 CRITICAL"
+    triggers: ["dado pessoal", "dado de saúde", "PHI", "PII", "privacidade", "LGPD", "GDPR", "HIPAA", "consentimento"]
+    last_reviewed_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+      source_type: "legislation"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Alinhamento com Art. 11 e 14 da LGPD sobre salvaguarda de dados sensíveis."
+    decision_points:
+      - point: "Soberania e Localização dos Dados"
+        question: "Os dados processados incluem dados pessoais (PII) ou de saúde (PHI)? Onde serão armazenados?"
+        impact: "Define requisitos de jurisdição legal, isolamento de dados e auditoria de acesso."
+        options:
+          - name: "Isolamento Estrito / Infraestrutura Soberana"
+            pros: "Soberania total, blindagem de dados sensíveis."
+            cons: "Maior custo de manutenção operacional."
+            best_for: "Dados clínicos, prontuários e requisitos regulatórios estritos."
+          - name: "Cloud com Criptografia Gerenciada pelo Cliente (BYOK)"
+            pros: "Escalabilidade e conformidade com auditorias de segurança."
+            cons: "Exige gerenciamento e rotação de chaves criptográficas."
+            best_for: "Aplicações escaláveis com necessidade de isolamento."
+        default:
+          static: "Isolamento estrito para dados sensíveis e conformidade LGPD/HIPAA."
+
+      - point: "Modelo de Consentimento"
+        question: "Como o consentimento do titular será coletado, registrado e revogado?"
+        impact: "Obrigação legal em LGPD e GDPR. Ausência invalida o processamento."
+        options:
+          - name: "Opt-in explícito com registro auditável imutável"
+            pros: "Conformidade total e defensabilidade jurídica."
+            cons: "Fricção inicial no onboarding."
+            best_for: "Padrão obrigatório para dados de saúde e PII sensível."
+          - name: "Base legal alternativa (Legítimo interesse documentado)"
+            pros: "Menor fricção na adesão do usuário."
+            cons: "Inaplicável para dados de saúde (categorias especiais)."
+            best_for: "Dados operacionais sem dados sensíveis."
+        default:
+          static: "Opt-in explícito com registro imutável e mecanismo direto de revogação."
+
+  autenticacao_e_identidade:
+    description: "Estratégia de autenticação, sessões seguras e controle de acesso."
+    priority: "🔴 P0 CRITICAL"
+    triggers: ["login", "autenticação", "auth", "usuário", "sessão", "JWT", "OAuth", "RBAC", "ABAC"]
+    last_reviewed_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://pages.nist.gov/800-63-3/"
+      source_type: "standards_security"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Diretrizes NIST SP 800-63B para autenticação e gestão de ciclo de vida de sessões."
+    decision_points:
+      - point: "Estratégia de Gestão de Identidade"
+        question: "Como os usuários se autenticam e as sessões são controladas?"
+        impact: "Define a superfície de ataque inicial e a integridade de acesso ao sistema."
+        options:
+          - name: "Serviço de Identidade Desacoplado / Provedor OIDC"
+            pros: "MFA nativo, auditoria de sessões e rotação de credenciais padronizada."
+            cons: "Dependência de provedor de identidade."
+            best_for: "Aplicações corporativas e sistemas com múltiplos perfis de acesso."
+          - name: "Mecanismo Próprio com Hashing Moderno (Argon2 / bcrypt)"
+            pros: "Controle total sem dependências externas."
+            cons: "Responsabilidade total pela implementação de segurança e recuperação."
+            best_for: "Projetos autocontidos ou com restrição estrita de rede."
+        default:
+          static: "Mecanismo com hashing forte e MFA para contas com acesso privilegiado."
+
+      - point: "Modelo de Controle de Acesso"
+        question: "O controle de acesso é baseado em papéis (RBAC) ou atributos contextuais (ABAC)?"
+        impact: "Controle insuficiente pode permitir escalada de privilégios ou vazamento de dados."
+        options:
+          - name: "RBAC Hierárquico"
+            pros: "Simplicidade de entendimento e implementação."
+            cons: "Rigidez para cenários multi-tenant complexos."
+            best_for: "Sistemas com funções bem definidas (Admin, Editor, Visualizador)."
+          - name: "ABAC com Isolamento Multi-Tenant Estrito"
+            pros: "Granularidade fina e isolamento por inquilino/organização."
+            cons: "Maior complexidade na modelagem de regras."
+            best_for: "Plataformas multi-tenant ou com dados restritos por contexto."
+        default:
+          static: "Isolamento multi-tenant estrito com checagem mandatória de escopo em cada requisição."
+
+  seguranca_de_api_e_comunicacao:
+    description: "Proteção de contratos de API, rate limiting e sanitização de entradas."
+    priority: "🔴 P0 CRITICAL"
+    triggers: ["API", "endpoint", "rota", "rate limit", "token", "chave de API", "sanitização"]
+    last_reviewed_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://owasp.org/www-project-api-security/"
+      source_type: "standards_security"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Mitigações para OWASP API Security Top 10."
+    decision_points:
+      - point: "Autenticação e Autorização em Endpoints"
+        question: "Como os clientes de API são autenticados? Há rotas públicas com acesso a dados?"
+        impact: "Endpoints desprotegidos expõem dados sensíveis a scraping e abuso."
+        options:
+          - name: "Tokens JWT de vida curta com verificação criptográfica estrita"
+            pros: "Stateless, escalável e padronizado."
+            cons: "Requer gestão de revogação de tokens comprometidos."
+            best_for: "APIs para aplicações web e móveis."
+          - name: "API Keys assinadas com limitação estrita de taxa (Rate Limit)"
+            pros: "Simplicidade para integrações máquina-máquina (B2B)."
+            cons: "Exige rotação periódica de chaves."
+            best_for: "Webhooks e comunicação entre serviços."
+        default:
+          static: "JWT com expiração curta para clientes e rate limit rigoroso em todos os endpoints."
+
+  # ═══════════════════════════════════════════════
+  # HIGH-LEVERAGE — Arquitetura de Software e Decisões Estruturais
+  # ═══════════════════════════════════════════════
+
+  arquitetura_de_aplicacao:
+    description: "Organização estrutural do código baseada em componentes atômicos orientados a SRP."
+    priority: "🟡 HIGH-LEVERAGE"
+    triggers: ["arquitetura", "módulo", "componente", "SRP", "SOLID", "desacoplamento", "camadas"]
+    last_reviewed_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html"
+      source_type: "engineering_authority"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Adoção de componentes desacoplados com Princípio da Responsabilidade Única (SRP)."
+    decision_points:
+      - point: "Composição e Modularidade do Sistema"
+        question: "Como o código é organizado para garantir que cada componente tenha uma única razão para mudar?"
+        impact: "Impacta a velocidade de desenvolvimento, facilidade de testes unitários e manutenibilidade a longo prazo."
+        options:
+          - name: "Componentes Atômicos Orientados a SRP com Contratos Estritos"
+            pros: "Alta coesão, baixo acoplamento, testabilidade isolada e zero efeito colateral."
+            cons: "Exige planejamento prévio de interfaces e tipagem estrita."
+            best_for: "Padrão canônico para todas as aplicações desenvolvidas sob o Vitalia Kit."
+          - name: "Camadas Tradicionais (Controller/Service/Repository acoplados)"
+            pros: "Estrutura amplamente conhecida."
+            cons: "Tendência a serviços inflados (god classes) que violam o SRP."
+            best_for: "Sistemas legados em processo de refatoração gradual."
+        default:
+          static: "Componentes atômicos e coesos regidos por SRP, com contratos explícitos e interfaces puras."
+
+      - point: "Comunicação Inter-Componentes"
+        question: "Como os componentes trocam informações e compartilham estado?"
+        impact: "Determina a dependência entre módulos e a capacidade de substituição independente."
+        options:
+          - name: "Chamadas Diretas em Memória com Contratos Tipados (Interfaces/Protocolos)"
+            pros: "Latência zero, sem infraestrutura externa, depuração simplificada."
+            cons: "Requer alinhamento de tipos entre emissor e receptor."
+            best_for: "Aplicações autocontidas e sistemas desacoplados de rede."
+          - name: "Mensageria ou Event-Driven Desacoplado"
+            pros: "Desacoplamento temporal completo entre produtores e consumidores."
+            cons: "Complexidade adicional de rastreamento de eventos e consistência eventual."
+            best_for: "Cenários de alto volume com processamento distribuído comprovado."
+        default:
+          static: "Contratos tipados em memória — evitar mensageria distribuída prematura sem necessidade de escala."
+
+  comunicacao_e_sincronizacao:
+    description: "Estratégia de sincronização de estado e atualização da interface do usuário."
+    priority: "🟡 HIGH-LEVERAGE"
+    triggers: ["tempo real", "notificação", "WebSocket", "SSE", "polling", "sincronização", "estado"]
+    last_reviewed_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events"
+      source_type: "standards_documentation"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Padrões de sincronização web modernos sem dependência de brokers locais."
+    decision_points:
+      - point: "Estratégia de Atualização de Estado"
+        question: "A aplicação exige notificações push em tempo real ou atualizações por demanda são suficientes?"
+        impact: "Infraestrutura de WebSockets exige gestão de conexões ativas; polling é mais simples e robusto."
+        options:
+          - name: "Polling Inteligente ou Revalidação por Foco"
+            pros: "Zero infraestrutura adicional, opera sobre HTTP padrão, simples de debugar."
+            cons: "Latência de alguns segundos entre o evento e a visualização."
+            best_for: "MVPs, dashboards gerenciais e tarefas de ciclo de vida assíncrono."
+          - name: "Server-Sent Events (SSE) Unidirecional"
+            pros: "Conexão HTTP contínua, reconexão nativa do navegador, menor overhead que WebSockets."
+            cons: "Apenas unidirecional (servidor -> cliente)."
+            best_for: "Feeds de logs em tempo real e notificações contínuas."
+          - name: "WebSockets Bidirecionais"
+            pros: "Latência submilisegundo e comunicação bidirecional contínua."
+            cons: "Requer servidores de conexão dedicados e gestão de reconexão."
+            best_for: "Aplicações colaborativas simultâneas ou chat em tempo real."
+        default:
+          static: "Polling inteligente para MVPs; evoluir para SSE ou WebSockets apenas com justificativa de latência."
+
+  processamento_assincrono:
+    description: "Desacoplamento de operações pesadas ou de longa duração."
+    priority: "🟡 HIGH-LEVERAGE"
+    triggers: ["background", "tarefa pesada", "worker", "job", "assíncrono", "fila"]
+    last_reviewed_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://docs.python.org/3/library/concurrent.futures.html"
+      source_type: "standards_documentation"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Processamento concorrente e em background com recursos nativos da linguagem."
+    decision_points:
+      - point: "Desacoplamento de Tarefas de Longa Duração"
+        question: "Existem operações que excedem o tempo de resposta aceitável de requisição HTTP (>2s)?"
+        impact: "Operações bloqueantes causam timeouts na interface e degradam a experiência do usuário."
+        options:
+          - name: "Execução Não-Bloqueante Nativa (Tasks em Background / Threads / Processos)"
+            pros: "Sem dependência de brokers de fila locais (como Redis/RabbitMQ), alta portabilidade."
+            cons: "Suscetível a perda se o processo principal for interrompido abruptamente."
+            best_for: "Geração de relatórios leves, envios de e-mail e processamento assíncrono padrão."
+          - name: "Filas de Mensagens Persistentes Gerenciadas"
+            pros: "Persistência em disco, retry garantido e escalabilidade horizontal de workers."
+            cons: "Requer serviços adicionais de fila ou nuvem (SQS/PubSub)."
+            best_for: "Processamento financeiro crítico ou fluxos de dados de alto volume."
+        default:
+          static: "Execução assíncrona desacoplada nativa — utilizar serviços de fila gerenciados apenas sob alta demanda."
+
+  arquitetura_de_dados_e_persistencia:
+    description: "Modelo de consistência, armazenamento e integridade de dados."
+    priority: "🟡 HIGH-LEVERAGE"
+    triggers: ["banco de dados", "schema", "migração", "consistência", "SQL", "NoSQL", "ACID", "transação"]
+    last_reviewed_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://www.sqlite.org/isolation.html"
+      source_type: "database_standards"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Garantias ACID e integridade transacional de dados."
+    decision_points:
+      - point: "Modelo de Consistência e Persistência"
+        question: "Qual o grau de integridade relacional necessário para os dados da aplicação?"
+        impact: "Define a facilidade de consultas complexas, integridade de auditoria e velocidade de iteração."
+        options:
+          - name: "Relacional com Garantias ACID (SQL)"
+            pros: "Alta integridade referencial, consultas analíticas com JOINs e suporte a transações estritas."
+            cons: "Migrações de esquema devem ser rigidamente versionadas."
+            best_for: "Dados financeiros, registros de saúde, entidades com relações estritas."
+          - name: "Armazenamento por Documentos / Chave-Valor (NoSQL / JSON Filesystem)"
+            pros: "Flexibilidade total de esquema e rápida iteração em protótipos."
+            cons: "Consistência eventual e ausência de restrições relacionais automáticas."
+            best_for: "Logs estruturados, cache de sessão, estados transitórios e metadados flexíveis."
+        default:
+          static: "Modelo relacional transacional para dados centrais de negócio; filesystem estruturado para logs e sessões."
+
+  machine_learning_e_ia_de_fronteira:
+    description: "Integração de modelos de linguagem de fronteira, orquestração e contexto."
+    priority: "🟡 HIGH-LEVERAGE"
+    triggers: ["LLM", "IA", "modelo", "inferência", "prompt", "embedding", "RAG", "Gemini", "Claude"]
+    last_reviewed_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://ai.google.dev/gemini-api/docs"
+      source_type: "vendor_documentation"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Modelos de fronteira em nuvem com grandes janelas de contexto (Context Lifting §11)."
+    decision_points:
+      - point: "Estratégia de Inferência e Governança de Dados"
+        question: "Como as chamadas aos modelos de linguagem serão realizadas e como a privacidade de prompts é garantida?"
+        impact: "Impacta a acurácia do raciocínio, limites de contexto e conformidade com privacidade."
+        options:
+          - name: "APIs de IA de Fronteira com Acordo de Não-Retenção de Dados"
+            pros: "Máxima capacidade de raciocínio, janelas de 1M-2M tokens, sem exigência de hardware local."
+            cons: "Custo por token e necessidade de conexão com a nuvem."
+            best_for: "Workflows complexos de engenharia de software, raciocínio adversarial e auditoria profunda."
+          - name: "Sanitização Prévia de Dados com Anonimização em Borda"
+            pros: "Dados pessoais ou clínicos nunca são enviados em texto claro aos modelos."
+            cons: "Exige módulo de desidentificação/anonimização prévio."
+            best_for: "Qualquer sistema que processe dados sensíveis antes de invocar APIs de IA."
+        default:
+          static: "Modelos de fronteira com grandes janelas de contexto e anonimização obrigatória de dados sensíveis."
+
+  observabilidade_e_auditoria:
+    description: "Registro de telemetria, trilhas de auditoria e controle de aprendizados."
+    priority: "🟠 MEDIUM"
+    triggers: ["log", "monitoramento", "observabilidade", "auditoria", "trilha", "métricas"]
+    last_reviewed_at: "06-11-2026 22:55:00(GMT-04:00)"
+    valid_until: "06-11-2027 22:55:00(GMT-04:00)"
+    validity_window_days: 365
+    status: "ACTIVE"
+    last_update_source:
+      url: "https://opentelemetry.io/docs/"
+      source_type: "standards_documentation"
+      verified_by: "session_20261106_2255"
+      machine_id: "42c8e746"
+      summary_of_changes: "Padronização de logs estruturados e rastreamento imutável."
+    decision_points:
+      - point: "Estratégia de Logging Estruturado e Auditoria"
+        question: "Como os eventos do sistema são persistidos e correlacionados?"
+        impact: "Essencial para diagnóstico forense e conformidade regulatória sem vazamento de dados."
+        options:
+          - name: "Structured Logging em Formato JSONL com Sanitização Automática"
+            pros: "Facilidade de ingestão automatizada, legibilidade por máquina e auditabilidade direta."
+            cons: "Requer padronização de schema para todas as mensagens de log."
+            best_for: "Padrão de engenharia do kit para sessões, aprendizados e decisões."
+          - name: "Texto Livre / Logs Não-Estruturados"
+            pros: "Simplicidade imediata na escrita."
+            cons: "Dificuldade de parsing, impossibilidade de análise automatizada confiável."
+            best_for: "Apenas saída de terminal interativo para desenvolvedor."
+        default:
+          static: "JSONL estruturado para persistência de dados de auditoria; terminal limpo e conciso para humanos."

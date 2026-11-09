@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
-# agent_preserver.sh | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
-# Preservação não-destrutiva de AGENTS.md e SKILL.md via marcadores e manifesto SHA-256.
-# Referência: FR-008, FR-009, P06, NF-001, NF-002, NF-003.
+# agent_preserver.sh | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:56(GMT-04:00)
+# Preservação não-destrutiva de AGENTS.md e SKILL.md via marcadores e manifesto SHA-256 fora de .agents/skills/.
+# Referência: FR-003, PRES-03/BUG-03, RCA-04a.
 
 [ -n "${_VITALIA_AGENT_PRESERVER_LOADED:-}" ] && return 0
 _VITALIA_AGENT_PRESERVER_LOADED=1
 
-# Carrega logger se disponível
-if ! command -v log_ok &>/dev/null; then
+if ! command -v log_ok >/dev/null 2>&1; then
     _LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     if [ -f "${_LIB_DIR}/logger.sh" ]; then
         # shellcheck source=/dev/null
@@ -26,6 +25,7 @@ END_MARKER="<!-- VITALIA:KIT:END -->"
 update_agents_md() {
     local target_file="${1:-}"
     local kit_content="${2:-}"
+    local backups_dir="${3:-}"
 
     if [ -z "${target_file}" ] || [ -z "${kit_content}" ]; then
         log_error "update_agents_md requer caminho do arquivo e conteúdo do Kit"
@@ -36,10 +36,14 @@ update_agents_md() {
     target_dir="$(dirname "${target_file}")"
     mkdir -p "${target_dir}"
 
+    if [ -z "${backups_dir}" ]; then
+        backups_dir="$(dirname "${target_dir}")/.vitalia/backups"
+    fi
+    mkdir -p "${backups_dir}"
+
     local ts
     ts="$(date +%Y%m%d%H%M%S)"
 
-    # Ramo 1: Arquivo ausente → cria apenas o bloco do kit
     if [ ! -f "${target_file}" ]; then
         cat << EOF > "${target_file}"
 ${START_MARKER}
@@ -50,20 +54,14 @@ EOF
         return 0
     fi
 
-    # Ramo 2: Com marcadores existentes → substitui apenas o miolo
     if grep -qF "${START_MARKER}" "${target_file}" && grep -qF "${END_MARKER}" "${target_file}"; then
         local tmp_file
         tmp_file="$(mktemp)"
 
-        # Extrai conteúdo anterior ao START_MARKER
         sed -n "1,/${START_MARKER}/p" "${target_file}" | grep -vF "${START_MARKER}" > "${tmp_file}" || true
-
-        # Insere o novo bloco delimitado
         echo "${START_MARKER}" >> "${tmp_file}"
         printf "%s\n" "${kit_content}" >> "${tmp_file}"
         echo "${END_MARKER}" >> "${tmp_file}"
-
-        # Extrai conteúdo posterior ao END_MARKER
         sed -n "/${END_MARKER}/,\$p" "${target_file}" | grep -vF "${END_MARKER}" >> "${tmp_file}" || true
 
         mv "${tmp_file}" "${target_file}"
@@ -71,21 +69,19 @@ EOF
         return 0
     fi
 
-    # Ramo 3: Legado do kit (sem marcadores, contém '# AGENTS.md — Kit Global')
-    if grep -q "AGENTS.md — Kit Global" "${target_file}"; then
-        local bak_file="${target_file}.bak.${ts}"
+    if grep -q "AGENTS.md —" "${target_file}"; then
+        local bak_file="${backups_dir}/AGENTS.md.bak.${ts}"
         cp "${target_file}" "${bak_file}"
         cat << EOF > "${target_file}"
 ${START_MARKER}
 ${kit_content}
 ${END_MARKER}
 EOF
-        log_ok "[MIGRADO] AGENTS.md legado migrado para marcadores (backup em $(basename "${bak_file}"))"
+        log_ok "[MIGRADO] AGENTS.md legado migrado para marcadores (backup em .vitalia/backups/)"
         return 0
     fi
 
-    # Ramo 4: Conteúdo de terceiros / customizado sem marcadores
-    local bak_file="${target_file}.bak.${ts}"
+    local bak_file="${backups_dir}/AGENTS.md.bak.${ts}"
     cp "${target_file}" "${bak_file}"
     local tmp_file
     tmp_file="$(mktemp)"
@@ -98,7 +94,7 @@ ${END_MARKER}
 EOF
     cat "${target_file}" >> "${tmp_file}"
     mv "${tmp_file}" "${target_file}"
-    log_ok "[PRESERVADO] Conteúdo customizado preservado abaixo do bloco do Kit (backup em $(basename "${bak_file}"))"
+    log_ok "[PRESERVADO] Conteúdo customizado preservado abaixo do bloco do Kit"
     return 0
 }
 
@@ -123,13 +119,12 @@ set_manifest_hash() {
     local new_hash="${2:-}"
     local manifest_file="${3:-}"
 
+    mkdir -p "$(dirname "${manifest_file}")"
     touch "${manifest_file}"
     local tmp_m
     tmp_m="$(mktemp)"
 
-    # Remove entrada anterior se existir
     grep -v -E "[[:space:]]+${rel_path}\$" "${manifest_file}" > "${tmp_m}" 2>/dev/null || true
-    # Adiciona nova entrada
     printf "%s  %s\n" "${new_hash}" "${rel_path}" >> "${tmp_m}"
     mv "${tmp_m}" "${manifest_file}"
 }
@@ -138,17 +133,22 @@ update_skill() {
     local skill_name="${1:-}"
     local skill_content="${2:-}"
     local skills_dir="${3:-}"
+    local vitalia_dir="${4:-}"
+
+    if [ -z "${vitalia_dir}" ]; then
+        vitalia_dir="$(dirname "$(dirname "${skills_dir}")")/.vitalia"
+    fi
 
     local skill_folder="${skills_dir}/${skill_name}"
     local target_file="${skill_folder}/SKILL.md"
     local rel_path="${skill_name}/SKILL.md"
-    local manifest_file="${skills_dir}/.vitalia-manifest"
+    local manifest_file="${vitalia_dir}/.vitalia-manifest"
+    local backups_dir="${vitalia_dir}/backups/skills"
 
-    mkdir -p "${skill_folder}"
+    mkdir -p "${skill_folder}" "${backups_dir}"
     local ts
     ts="$(date +%Y%m%d%H%M%S)"
 
-    # Caso 1: SKILL.md inexistente → criação direta
     if [ ! -f "${target_file}" ]; then
         printf "%s\n" "${skill_content}" > "${target_file}"
         local new_hash
@@ -163,10 +163,8 @@ update_skill() {
     local manifest_hash
     manifest_hash="$(get_manifest_hash "${rel_path}" "${manifest_file}")"
 
-    # Caso 2: Manifesto presente
     if [ -n "${manifest_hash}" ]; then
         if [ "${current_hash}" = "${manifest_hash}" ]; then
-            # Hash bate com manifesto → atualização silenciosa
             printf "%s\n" "${skill_content}" > "${target_file}"
             local new_hash
             new_hash="$(compute_skill_hash "${target_file}")"
@@ -174,10 +172,9 @@ update_skill() {
             log_ok "[ATUALIZADA] ${rel_path} (silenciosa)"
             return 0
         else
-            # Hash não bate → edição do usuário detectada: backup antes de atualizar
-            local bak_file="${target_file}.bak.${ts}"
+            local bak_file="${backups_dir}/${skill_name}_SKILL.md.bak.${ts}"
             cp "${target_file}" "${bak_file}"
-            log_warn "[BACKUP] Edição do usuário detectada em ${rel_path} -> backup em $(basename "${bak_file}")"
+            log_warn "[BACKUP] Edição do usuário detectada em ${rel_path} -> backup em .vitalia/backups/skills/"
             printf "%s\n" "${skill_content}" > "${target_file}"
             local new_hash
             new_hash="$(compute_skill_hash "${target_file}")"
@@ -187,23 +184,20 @@ update_skill() {
         fi
     fi
 
-    # Caso 3: Sem manifesto (instalação anterior)
     local tmp_new
     tmp_new="$(mktemp)"
     printf "%s\n" "${skill_content}" > "${tmp_new}"
 
     if cmp -s "${target_file}" "${tmp_new}"; then
-        # Conteúdo idêntico ao template: apenas registra manifesto sem backup
         rm -f "${tmp_new}"
         set_manifest_hash "${rel_path}" "${current_hash}" "${manifest_file}"
         log_ok "[MANIFESTO] ${rel_path} registrada no manifesto"
         return 0
     else
-        # Conteúdo diferente: backup preventivo único e atualização
         rm -f "${tmp_new}"
-        local bak_file="${target_file}.bak.${ts}"
+        local bak_file="${backups_dir}/${skill_name}_SKILL.md.bak.${ts}"
         cp "${target_file}" "${bak_file}"
-        log_warn "[BACKUP] Skill legada com alterações em ${rel_path} -> backup em $(basename "${bak_file}")"
+        log_warn "[BACKUP] Skill legada com alterações em ${rel_path} -> backup em .vitalia/backups/skills/"
         printf "%s\n" "${skill_content}" > "${target_file}"
         local new_hash
         new_hash="$(compute_skill_hash "${target_file}")"
@@ -211,43 +205,4 @@ update_skill() {
         log_ok "[ATUALIZADA] ${rel_path} migrada para manifesto após backup"
         return 0
     fi
-}
-
-update_all_skills() {
-    local extensions_dir="${1:-}"
-    local skills_dir="${2:-}"
-    local template_file="${3:-}"
-    local version="${4:-0.6.0}"
-    local kit_dir="${5:-~/.vitalia}"
-
-    if [ ! -d "${extensions_dir}" ] || [ ! -f "${template_file}" ]; then
-        log_error "update_all_skills: diretório de extensões ou template ausente"
-        return 1
-    fi
-
-    mkdir -p "${skills_dir}"
-
-    for toml_file in "${extensions_dir}"/*.toml; do
-        [ -f "${toml_file}" ] || continue
-        local ext_name
-        ext_name="$(basename "${toml_file}" .toml)"
-
-        # Extrai descrição do TOML com fallback defensivo
-        local desc
-        desc="$(grep -E '^[[:space:]]*description[[:space:]]*=' "${toml_file}" | head -n 1 | sed -E 's/^[[:space:]]*description[[:space:]]*=[[:space:]]*["'"'"']?//; s/["'"'"'][[:space:]]*$//')"
-        [ -z "${desc}" ] && desc="Comando ${ext_name} do Vitalia Kit."
-
-        # Renderiza template
-        local rendered
-        rendered="$(sed \
-            -e "s|{{NAME}}|${ext_name}|g" \
-            -e "s|{{DESCRIPTION}}|${desc}|g" \
-            -e "s|{{VERSION}}|${version}|g" \
-            -e "s|{{VITALIA_KIT_DIR}}|${kit_dir}|g" \
-            "${template_file}")"
-
-        update_skill "vitalia-${ext_name}" "${rendered}" "${skills_dir}"
-    done
-
-    return 0
 }

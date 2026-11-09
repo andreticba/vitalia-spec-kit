@@ -1,11 +1,11 @@
-# brainstorming.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# brainstorming.toml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:52(GMT-04:00)
 # Contratos atendidos: C1, C2, C3, C4, C5, C6, C7
 # Redesign: remove {{args}} do prompt (anti-Lost in the Middle)
 # Brainstorming é o Supervisor — entry point do ciclo SDD
 description = "Protocolo socrático para estruturar features ou requisitos complexos antes da execução."
 
 [meta]
-version = "0.6.0"
+version = "0.0.1"
 hardware_profile = "frontier"
 domain_gates = []
 
@@ -15,7 +15,7 @@ after  = []
 
 [tools]
 required = ["read_file"]
-optional = ["write_file"]
+optional = ["write_file", "search_web", "run_command", "define_subagent", "invoke_subagent"]
 
 [context]
 reads = [
@@ -28,8 +28,7 @@ reads = [
 writes = []
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:brainstorming"
+preferred     = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
 
@@ -71,13 +70,21 @@ necessário e só encaminha ao pipeline SDD quando o consenso estiver claro.
 ou código) durante a fase de clarificação. Sua resposta deve focar **exclusivamente**
 no bloco de perguntas socráticas e no gerenciamento de escopo.
 
-### SCAN (Análise Contextual — invisível ao usuário)
+### SCAN (Análise Contextual, Grounding e Engenharia Reversa — invisível ao usuário)
 1. Examine `guardian_json` em silêncio: leia `user_input`, `env_summary`,
-   `context_learnings`, `context_decisions` e `brainstorming_intents`.
+   `context_learnings`, `context_decisions`, `brainstorming_intents` e `phase_guardrails`.
 2. Se `brainstorming_intents` detectar domínio `saude_clinica` com `p0_flag: true`,
    as perguntas de saúde/privacidade precedem **qualquer** outra discussão.
-3. Se o input der match em `brainstorming_intents`, prepare delegação ao agente
-   especializado antes de formular perguntas de arquitetura.
+3. **Pesquisa e Grounding de Fronteira via Sub-Agente (P03):**
+   - Sempre que o tema envolver especificações de ferramentas (ex: Antigravity IDE), bibliotecas, APIs ou tecnologias em evolução, delegue a investigação a um Sub-Agente com acesso à rede (`define_subagent` `vitalia-researcher` ou `self` — NUNCA use o subagente `research` built-in sem rede para busca web).
+   - Exija validação de links reais (HTTP 200), leitura integral do conteúdo das páginas (seguindo referências para conteúdos mais recentes) e verificação de depreciação.
+4. **Engenharia Reversa Funcional em 3 Camadas (para refatorações/evoluções):**
+   - Nunca proponha copiar cegamente código antigo nem reescrevê-lo do zero sem antes analisar cada componente em 3 camadas:
+     a) **Intenção de Negócio Pura:** o que o componente resolvia de fato (ex: verificar e clonar repositório remoto existente);
+     b) **Purga de Infraestrutura Legada:** o que deve ser removido (ex: Redis, Celery, Ollama local, podas de tokens);
+     c) **Contrato do Consumidor:** o que o cliente (ex: Antigravity IDE) exige estritamente (ex: `.agents/skills/` puro sem arquivos ocultos ou `.trash`).
+5. **Classificação na Matriz de Testes (P05):**
+   - Identifique quais partes da demanda são Código Novo (`[TEST:NEW]`), Correção de Bug (`[TEST:BUGFIX]`), Refatoração Pura (`[TEST:REFACTOR]`) ou Migração Arquitetural (`[TEST:MIGRATION]`).
 
 ### ASK (Formulação Iterativa — máximo 3 por turno)
 Formule **NO MÁXIMO 3 perguntas** por interação, usando o formato obrigatório abaixo.
@@ -164,14 +171,16 @@ Quando todas as decisões estiverem tomadas e validadas com o usuário:
    Escrever o arquivo `research-brainstorming.md` no diretório da feature ativa
    (ex: `specs/<feature>/research-brainstorming.md` ou em `specs/`) contendo:
    - Resumo Executivo das decisões tomadas e trade-offs acordados
+   - Engenharia Reversa Funcional em 3 Camadas dos componentes afetados (Intenção a Preservar vs. Legado a Purgar vs. Contrato do Cliente)
+   - Classificação da Estratégia de Testes pela Matriz P05 (`[TEST:NEW]`, `[TEST:BUGFIX]`, `[TEST:REFACTOR]`, `[TEST:MIGRATION]`) e Cenários de Falsificação
    - Requisitos funcionais preliminares e escopo delimitado (com ideias estacionadas)
-   - Rastro de Pesquisa e Grounding: `| # | Afirmação | Verificado? | Fonte | Data |`
+   - Rastro de Pesquisa e Grounding (com leitura integral e HTTP 200): `| # | Afirmação / Tecnologia | Fonte Canônica | URL Validada (HTTP 200) | Status Temporal | Data |`
    - Link clicável para o arquivo gerado no output final
 
 2. **Gerar Handoff Local Progressivo (Direction: Forward):**
    Executar o utilitário de handoff para registrar a transição determinística:
    ```bash
-   python3 ~/.vitalia/src/vitalia_handoff.py create \
+   python3 {{VITALIA_KIT_DIR}}/src/vitalia_handoff.py create \
      --source "brainstorming" \
      --target "route" \
      --direction "forward" \

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# logger.sh | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
-# Biblioteca de logging padronizado com suporte ANSI, compatível com bash 3.2+ e set -euo pipefail.
-# Referência: FR-006, NF-001, NF-002.
+# logger.sh | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:55(GMT-04:00)
+# Biblioteca de logging padronizado com suporte ANSI, compatível com bash/zsh e set -euo pipefail.
 
 [ -n "${_VITALIA_LOGGER_LOADED:-}" ] && return 0
 _VITALIA_LOGGER_LOADED=1

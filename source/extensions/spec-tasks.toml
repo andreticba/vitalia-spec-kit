@@ -1,11 +1,11 @@
-# spec-tasks.toml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
-description = "Converte o plan.md aprovado em tasks.md com tarefas atômicas T001 [P] [US1], fases estruturadas e MVP scope explícito."
+# spec-tasks.toml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:52(GMT-04:00)
+description = "Converte o plan.md aprovado em tasks.md com tarefas atômicas T001 [P] [US1], Matriz de Testes P05, Cenário de Falsificação e MVP scope explícito."
 
 [meta]
-version          = "0.3.0"
-hardware_profile = "lightweight"
+version          = "0.0.1"
+hardware_profile = "frontier"
 domain_gates     = []
-model_profile    = "flash"
+model_profile    = "pro"
 
 [hooks]
 before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
@@ -30,10 +30,13 @@ input  = ["args", "feature_directory"]
 output = ["tasks_file", "task_count", "mvp_task_count"]
 
 [transport]
-preferred     = "redis"
-redis_key     = "vitalia:workflow:tasks"
+preferred     = "filesystem"
 file_path     = ".vitalia/pipeline.json"
 session_shard = true
+
+[guardian]
+yaml_sources     = ["constitution", "grounding_domains"]
+guardian_profile = "gp_spec-tasks"
 
 prompt = """
 ## User Input
@@ -79,27 +82,44 @@ Se `.vitalia/extensions.yml` existir, executar hooks em `hooks.before_tasks`.
 - [ ] T### [P] [USN] Descrição clara com caminho/de/arquivo/exato
 ```
 
+Para **TODA tarefa de teste**, é OBRIGATÓRIO incluir a tag da **Matriz de Testes P05** e o **Cenário de Falsificação**:
+```
+- [ ] T### [P] [USN] [TEST:NEW|BUGFIX|REFACTOR|MIGRATION] Criar/executar teste em caminho/do/teste.py — Cenário de Falsificação: <qual comportamento de negócio, execução real ou invariante de contrato fará este teste falhar se quebrado/omitido>
+```
+
+| Modalidade de Teste (P05) | Quando usar | Regra de Falsificação |
+|---|---|---|
+| `[TEST:NEW]` | Código ou componente inédito | O teste executa a nova funcionalidade (caixa-preta), falha antes da implementação (Red) e passa após o código (Green). |
+| `[TEST:BUGFIX]` | Correção de defeito ou omissão | **Bug Reproduction First:** O teste reproduz o defeito real e **DEVE falhar contra o código atual antes do fix**, passando somente após a correção. |
+| `[TEST:REFACTOR]` | Reestruturação interna sem alterar contrato | **Behavioral Characterization:** O teste exercita entradas/saídas de negócio antes e depois da mudança garantindo zero regressão. |
+| `[TEST:MIGRATION]` | Adaptação arquitetural / desacoplamento de legado | **Contract Preservation + Clean Purge:** O teste comprova que os comportamentos funcionais estáveis do módulo antigo sobrevivem na nova arquitetura enquanto a infraestrutura obsoleta foi removida e as invariantes do consumidor (ex: diretórios puros) são respeitadas. |
+
+> ⛔ **PROIBIÇÃO ABSOLUTA DE TESTES SINTÁTICOS/RASOS (P05):**
+> Nenhuma tarefa de teste pode ter como critério apenas `assert path.is_file()` ou `assert "string" in path.read_text()`. Todo teste deve exercitar execução comportamental real e possuir Cenário de Falsificação explícito.
+
 | Componente | Obrigatoriedade | Descrição |
 |---|---|---|
 | `- [ ]` | SEMPRE | Checkbox markdown |
 | `T###` | SEMPRE | ID sequencial 3 dígitos em ordem de execução |
 | `[P]` | QUANDO paralelizável | Sem dependências com tasks incompletas |
 | `[USN]` | APENAS nas fases de US | Rastreia qual User Story esta task serve |
+| `[TEST:...]` + Cenário de Falsificação | SEMPRE em tasks de teste | Modalidade P05 + condição comportamental de falha |
 | Descrição com caminho | SEMPRE | Ação clara com caminho de arquivo exato |
 
 **Corretos**:
 ```
 - [ ] T001 Criar estrutura de diretórios conforme plan.md
-- [ ] T005 [P] [US1] Implementar rota GET /items em backend/routes/items.py
-- [ ] T006 [P] [US1] Criar testes em backend/tests/test_items.py
+- [ ] T005 [P] [US1] [TEST:NEW] Criar testes funcionais para GET /items em backend/tests/test_items.py — Cenário de Falsificação: falha se o endpoint não retornar HTTP 200 com payload JSON filtrado pelo tenant ativo
+- [ ] T006 [P] [US1] Implementar rota GET /items em backend/routes/items.py
 - [ ] T007 [US1] Integrar rota em backend/main.py
 ```
 
 **Errados**:
 ```
-- [ ] Criar rota               ← sem ID e sem caminho
-- T005 [US1] Criar modelo      ← sem checkbox
-- [ ] T005 [US1] Criar modelo  ← sem caminho de arquivo
+- [ ] Criar rota                                         ← sem ID e sem caminho
+- T005 [US1] Criar modelo                                ← sem checkbox
+- [ ] T005 [US1] Criar testes em tests/test_x.py         ← tarefa de teste sem [TEST:...] e sem Cenário de Falsificação
+- [ ] T005 [US1] [TEST:NEW] Verificar se arquivo existe  ← teste sintático raso (violação P05)
 ```
 
 #### ESTRUTURA DE FASES:

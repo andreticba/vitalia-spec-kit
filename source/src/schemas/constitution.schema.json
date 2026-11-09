@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "domain_index",
+    "principles"
+  ],
+  "properties": {
+    "schema_type": {
+      "type": "string",
+      "enum": [
+        "constitution"
+      ]
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "domain_index": {
+      "type": "object"
+    },
+    "principles": {
+      "type": "object"
+    }
+  }
+}
+

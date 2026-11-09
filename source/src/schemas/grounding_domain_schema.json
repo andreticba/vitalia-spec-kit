@@ -1,0 +1,57 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "timestamp",
+    "machine_id"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "new_domain",
+        "scope_decision"
+      ]
+    },
+    "scope": {
+      "type": "string",
+      "nullable": true,
+      "enum": [
+        "global",
+        "local",
+        "rejected"
+      ]
+    },
+    "domain": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "authoritative_sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "machine_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "target_id": {
+      "type": "string"
+    },
+    "decided_by": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+# gp_spec-plan.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Guardian Profile para spec-plan.
+# Sem poda de contexto (no_prune: true) + Lente de Fase para Arquitetura, TDA e Matriz de Migração.
+
+schema_type: "guardian_profile"
+schema_version: "0.0.1"
+workflow: "spec-plan"
+
+hardware_profile: "frontier"
+
+tokens:
+  total_budget: 0
+  source_weights:
+    constitution: 1.0
+    grounding_domains: 1.0
+
+constitution:
+  no_prune: true
+  domains: []
+  severity_filter: ["BLOCKING", "WARNING", "INFO"]
+  principles_include: []
+
+phase_guardrails:
+  phase: "plan"
+  role: "Arquiteto de Sistemas & Definidor do Test Depth Agreement (TDA)"
+  mandatory_checks:
+    - "Test Depth Agreement (TDA) obrigatório no plan.md: estipular para cada componente a modalidade da Matriz P05 ([TEST:NEW], [TEST:BUGFIX], [TEST:REFACTOR], [TEST:MIGRATION]) e a profundidade mínima (Black-Box E2E executável, Invariância de Contrato, Negative/Chaos Testing)."
+    - "Matriz de Migração e Preservação Comportamental obrigatória quando modificar/refatorar código existente: mapear (Componente | Comportamento Existente a Preservar | Acoplamento/Defeito a Purgar | Estratégia de Teste [TEST:MIGRATION])."
+    - "Contratos do Consumidor explícitos: documentar invariantes estritas do cliente (ex: pureza de diretórios .agents/skills/, schemas OpenAPI 3.0 limpos)."
+    - "Decisões em research.md verificadas via Sub-Agente de pesquisa com URL HTTP 200, leitura completa da página e checagem de depreciação."
+
+session_context:
+  include_p0: true
+  include_active_feature: true
+  include_agents_queue: false
+  include_user_input: true

@@ -1,0 +1,38 @@
+# gp_research.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Guardian Profile para o workflow research (Vitalia Researcher — Grounding P03 e Engenharia Reversa).
+# Sem poda de contexto (no_prune: true).
+
+schema_type: "guardian_profile"
+schema_version: "0.0.1"
+workflow: "research"
+
+hardware_profile: "frontier"
+
+tokens:
+  total_budget: 0
+  source_weights:
+    constitution: 1.0
+    grounding_domains: 1.0
+    agents_catalog: 1.0
+
+constitution:
+  no_prune: true
+  domains: []
+  severity_filter: ["BLOCKING", "WARNING", "INFO"]
+  principles_include: []
+
+phase_guardrails:
+  phase: "research"
+  role: "Pesquisador de Fronteira Temporal, Verificador HTTP 200 & Analista de Contratos"
+  mandatory_checks:
+    - "Delegar ou executar busca com acesso real à rede (search_web + run_command curl HTTP 200) e leitura integral da documentação oficial."
+    - "Identificar avisos de depreciação e mudanças recentes em ferramentas de fronteira (ex: Antigravity IDE, LLMs, pacotes Python)."
+    - "Executar Engenharia Reversa Funcional em 3 Camadas para componentes existentes: (1) Intenção de negócio pura; (2) Infraestrutura legada a purgar; (3) Contrato estrito do consumidor."
+    - "Emitir Rastro de Pesquisa auditável com URLs verificadas (HTTP 200) e datas de consulta."
+
+session_context:
+  include_p0: true
+  include_active_feature: true
+  include_agents_queue: false
+  include_user_input: true
+

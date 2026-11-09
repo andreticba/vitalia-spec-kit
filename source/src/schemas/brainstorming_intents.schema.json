@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "domains"
+  ],
+  "properties": {
+    "schema_type": {
+      "type": "string",
+      "enum": [
+        "brainstorming_intents"
+      ]
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "domains": {
+      "type": "object"
+    }
+  }
+}
+

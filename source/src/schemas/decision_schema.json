@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "required": [
+    "type",
+    "category",
+    "decision",
+    "rationale"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "decision"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "ARQUITETURA",
+        "PROJETO"
+      ]
+    },
+    "decision": {
+      "type": "string"
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "machine_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    }
+  }
+}

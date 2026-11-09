@@ -1,0 +1,39 @@
+# gp_architect.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Guardian Profile para o workflow architect (Vitalia Architect — Regência Técnica e Transição SDD).
+# Sem poda de contexto (no_prune: true).
+
+schema_type: "guardian_profile"
+schema_version: "0.0.1"
+workflow: "architect"
+
+hardware_profile: "frontier"
+
+tokens:
+  total_budget: 0
+  source_weights:
+    constitution: 1.0
+    routing_table: 1.0
+    agents_catalog: 1.0
+    grounding_domains: 1.0
+
+constitution:
+  no_prune: true
+  domains: []
+  severity_filter: ["BLOCKING", "WARNING", "INFO"]
+  principles_include: []
+
+phase_guardrails:
+  phase: "architect"
+  role: "Vitalia Architect — Arquiteto de Soluções & Tech Lead Sênior"
+  mandatory_checks:
+    - "Confrontar a concepção (research-brainstorming.md) contra 100% da Constituição ativa (P00–P17 sem poda)."
+    - "Garantir a separação topológica das 4 camadas: source/ no repositório raiz -> pasta escolhida pelo usuário (padrão ~/.vitalia-spec-kit) na instalação."
+    - "Enquadrar a demanda na Matriz de Testes P05 ([TEST:NEW], [TEST:BUGFIX], [TEST:REFACTOR], [TEST:MIGRATION]) e na Engenharia Reversa em 3 Camadas."
+    - "Registrar ADRs para decisões estruturantes e pausar para aprovação HITL antes do handoff para /vitalia-spec-specify."
+
+session_context:
+  include_p0: true
+  include_active_feature: true
+  include_agents_queue: true
+  include_user_input: true
+

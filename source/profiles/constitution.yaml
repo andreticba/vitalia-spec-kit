@@ -1,4 +1,4 @@
-# constitution.yaml | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# constitution.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:48(GMT-04:00)
 # Schema: Dual-Index (Opção D) — O(1) lookup por domain_id e principle_id
 # Fontes: docs/rules/always-on/*.md + docs/rules/file-triggered/*.md
 #         + OWASP LLM Top 10 2025 + EU AI Act Art.12 + CMAG 2025/2026
@@ -6,7 +6,7 @@
 # Validar com: python3 -m jsonschema --instance profiles/constitution.yaml src/schemas/constitution.schema.json
 
 schema_type: "constitution"
-schema_version: "0.6.0"
+schema_version: "0.0.1"
 
 # ─── ÍNDICE PRIMÁRIO: domain_id → [principle_id, ...] ────────────────────────
 domain_index:
@@ -84,11 +84,11 @@ principles:
     severity: "WARNING"
     rule: >
       Todo arquivo criado ou modificado contém na primeira linha o cabeçalho
-      `nome_arquivo | Vitalia SDD v0.6.0 | DD-MM-YYYY HH:MM(GMT-04:00)`.
+      `nome_arquivo | Vitalia SPEC Kit v0.0.1 | DD-MM-YYYY HH:MM(GMT-04:00)`.
       Em arquivos Markdown (.md), a primeira linha contém o comentário HTML
-      `<!-- nome_arquivo | Vitalia SDD v0.6.0 | DD-MM-YYYY HH:MM(GMT-04:00) -->` e a
+      `<!-- nome_arquivo | Vitalia SPEC Kit v0.0.1 | DD-MM-YYYY HH:MM(GMT-04:00) -->` e a
       segunda linha contém obrigatoriamente a repetição em formato visível:
-      `> **nome_arquivo | Vitalia SDD v0.6.0 | DD-MM-YYYY HH:MM(GMT-04:00)**`.
+      `> **nome_arquivo | Vitalia SPEC Kit v0.0.1 | DD-MM-YYYY HH:MM(GMT-04:00)**`.
       Fuso imutável America/Cuiaba (GMT-04:00) — sem exceções e sem DST.
     rationale: >
       Rastreabilidade exige que qualquer artefato possa ser datado. A repetição
@@ -97,18 +97,30 @@ principles:
     validator: "maintenance/header_stamp.py"
 
   P05:
-    name: "Test-First Development (TDD Inviolável)"
+    name: "Test-First Development & Behavioral Falsification Matrix (TDD Inviolável)"
     domain: "GOVERNANCE"
     severity: "BLOCKING"
     rule: >
-      Nenhuma lógica em services/, core/, domain/ ou use_cases/ é
-      implementada sem teste escrito antes (Red phase confirmada).
-      Cobertura mínima: Services 90%, Views 70%, Utils 80%, Models 85%.
-      Tool Hook: escrita em .py produtivo bloqueada sem teste no histórico.
+      Nenhuma lógica produtiva, script ou contrato é implementado ou alterado sem
+      teste automatizado correspondente classificado na Matriz de 4 Modalidades:
+      (1) [TEST:NEW] (Código Novo): TDD Red-Green-Refactor executável comprovando falha antes do código;
+      (2) [TEST:BUGFIX] (Correção de Bug): Bug Reproduction First — o teste DEVE reproduzir a falha
+      no código atual e falhar antes do fix, tornando-se verde somente após a correção;
+      (3) [TEST:REFACTOR] (Refatoração Pura): Behavioral Characterization — exercita entradas/saídas
+      de negócio antes e depois da mudança garantindo zero perda funcional;
+      (4) [TEST:MIGRATION] (Adaptação/Desacoplamento Arquitetural): Contract Preservation + Clean Purge —
+      combina Characterization Test das intenções de negócio que devem sobreviver à mudança arquitetural
+      com asserções provando a purga da infraestrutura legada e a pureza do contrato do consumidor.
+      Toda tarefa de teste em tasks.md DEVE declarar sua modalidade e seu Cenário de Falsificação
+      (qual comportamento de negócio real fará o teste falhar). É ESTRITAMENTE PROIBIDO (BLOCKING)
+      usar asserções puramente sintáticas/estáticas isoladas (como assert path.is_file() ou
+      assert "string" in path.read_text()) para atestar conclusão de funcionalidade ou bugfix.
     rationale: >
-      Código sem teste é dívida com data de validade curta. Red phase
-      confirma que o teste realmente verifica o comportamento esperado.
-    validator: "hooks/llm_judge.py --mode after_task"
+      Testes que verificam apenas existência de arquivos ou strings criam falsos positivos
+      ("teatro de conformidade") enquanto o sistema falha em execução real. A Matriz de 4 Modalidades
+      e o Cenário de Falsificação garantem que todo teste valide comportamento executável de caixa-preta
+      e que migrações arquiteturais jamais amputem comportamentos estáveis existentes.
+    validator: "/vitalia-judge"
 
   P06:
     name: "Secrets Never in Git"

@@ -1,0 +1,36 @@
+# gp_spec-specify.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Guardian Profile para spec-specify.
+# Sem poda de contexto (no_prune: true) + Lente de Fase para Especificação Comportamental e Contratos.
+
+schema_type: "guardian_profile"
+schema_version: "0.0.1"
+workflow: "spec-specify"
+
+hardware_profile: "frontier"
+
+tokens:
+  total_budget: 0
+  source_weights:
+    constitution: 1.0
+    grounding_domains: 1.0
+
+constitution:
+  no_prune: true
+  domains: []
+  severity_filter: ["BLOCKING", "WARNING", "INFO"]
+  principles_include: []
+
+phase_guardrails:
+  phase: "specify"
+  role: "Engenheiro de Requisitos & Guardião de Contratos"
+  mandatory_checks:
+    - "Acceptance Scenarios (Given/When/Then) e Success Criteria (SC-xxx) DEVEM definir comportamentos observáveis de caixa-preta e invariantes de contrato do consumidor."
+    - "PROIBIDO definir critérios de sucesso baseados apenas na mera existência sintática de arquivos ou strings."
+    - "Grounding de Fronteira (P03): toda suposição externa exige delegação ao Sub-Agente de pesquisa com HTTP 200 comprovado, leitura integral da documentação e verificação de não-depreciação."
+    - "Submissão obrigatória ao /vitalia-judge --mode=specify com pausa HITL soberana."
+
+session_context:
+  include_p0: true
+  include_active_feature: true
+  include_agents_queue: false
+  include_user_input: true

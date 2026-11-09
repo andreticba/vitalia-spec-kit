@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "agents"
+  ],
+  "properties": {
+    "schema_type": {
+      "type": "string",
+      "enum": [
+        "agents_catalog"
+      ]
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "role",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "planned"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+

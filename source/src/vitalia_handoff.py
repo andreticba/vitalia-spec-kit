@@ -1,4 +1,4 @@
-# vitalia_handoff.py | Vitalia SPEC Kit v0.0.1 | 02-11-2026 21:50(GMT-04:00)
+# vitalia_handoff.py | Vitalia SPEC Kit v0.0.1 | 08-11-2026 20:10(GMT-04:00)
 """
 Módulo de utilitários e CLI para criação, validação estrutural e consumo atômico
 de handoffs inter-agente locais em .vitalia/memory/data_storage/handoffs/.
@@ -15,10 +15,13 @@ import sys
 from typing import Any, Dict, Optional, Union
 import uuid
 
+CURRENT_DIR = Path(__file__).resolve().parent
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
+
+import kit_env_bootstrap
 import jsonschema
 
-# Resolução de diretórios do Kit Global
-CURRENT_DIR = Path(__file__).resolve().parent
 DEFAULT_SCHEMA_PATH = CURRENT_DIR / "schemas" / "vitalia-handoff-v1.0.0.json"
 
 
@@ -37,8 +40,7 @@ def resolve_project_root(start: Optional[Union[str, Path]] = None) -> Path:
     """
     curr = Path(start).resolve() if start is not None else Path.cwd().resolve()
     home = Path.home().resolve()
-    kit_dir_env = os.environ.get("VITALIA_KIT_DIR")
-    kit_dir = Path(kit_dir_env).resolve() if kit_dir_env else (home / ".vitalia")
+    kit_dir = kit_env_bootstrap.resolve_kit_dir(curr)
 
     # 1. Se start estiver dentro de uma árvore .vitalia/, sobe para fora dela
     while curr.name == ".vitalia" or any(p.name == ".vitalia" for p in curr.parents):
@@ -48,7 +50,7 @@ def resolve_project_root(start: Optional[Union[str, Path]] = None) -> Path:
 
     # 2. Sobe procurando .vitalia/ de projeto
     while True:
-        # 3 & 4. Ignora $HOME e VITALIA_KIT_DIR (~/.vitalia) e para ao alcançar $HOME
+        # 3 & 4. Ignora $HOME e VITALIA_KIT_DIR e para ao alcançar $HOME
         if curr == home or curr == kit_dir:
             break
 
@@ -99,8 +101,7 @@ def resolve_storage_dir(
         raise
 
     home = Path.home().resolve()
-    kit_dir_env = os.environ.get("VITALIA_KIT_DIR")
-    kit_dir = Path(kit_dir_env).resolve() if kit_dir_env else (home / ".vitalia")
+    kit_dir = kit_env_bootstrap.resolve_kit_dir(project_root)
 
     # Guardrail Zero Data Leak: raiz nunca pode ser $HOME
     if project_root.resolve() == home:
@@ -119,11 +120,11 @@ def resolve_storage_dir(
     storage_dir = data_storage / "handoffs"
     resolved_storage = storage_dir.resolve()
 
-    # Guardrail Zero Data Leak: caminho final não pode estar sob kit_dir (~/.vitalia)
+    # Guardrail Zero Data Leak: caminho final não pode estar sob kit_dir
     try:
         resolved_storage.relative_to(kit_dir)
         raise RuntimeError(
-            "Violação Zero Data Leak: tentativa de acessar storage global em ~/.vitalia."
+            "Violação Zero Data Leak: tentativa de acessar storage global no diretório do Kit."
         )
     except ValueError:
         pass

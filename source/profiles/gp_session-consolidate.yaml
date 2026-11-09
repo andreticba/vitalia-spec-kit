@@ -1,0 +1,34 @@
+# gp_session-consolidate.yaml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:50(GMT-04:00)
+# Guardian Profile para o workflow session-consolidate.
+# Sem poda de contexto (no_prune: true) + Lente de Fase para Fusão de Shards e Renderização do Dashboard.
+
+schema_type: "guardian_profile"
+schema_version: "0.0.1"
+workflow: "session-consolidate"
+
+hardware_profile: "frontier"
+
+tokens:
+  total_budget: 0
+  source_weights:
+    constitution: 1.0
+    routing_table: 1.0
+
+constitution:
+  no_prune: true
+  domains: []
+  severity_filter: ["BLOCKING", "WARNING", "INFO"]
+  principles_include: []
+
+session_context:
+  include_p0: true
+  include_active_feature: true
+  include_agents_queue: false
+
+phase_guardrails:
+  phase: "session-consolidate"
+  role: "Consolidador Multi-Máquina & Renderizador do Dashboard 3-Tier"
+  mandatory_checks:
+    - "Regra da Cerca Elétrica: NUNCA editar diretamente .vitalia/memory/session/README.md ou context.md; toda consolidação ocorre via vitalia_context_engine.py --action consolidate."
+    - "Ordenar os shards de máquinas por last_sync decrescente para preservar o active_focus e next_action mais recentes."
+

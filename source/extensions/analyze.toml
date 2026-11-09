@@ -1,0 +1,100 @@
+# analyze.toml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:52(GMT-04:00)
+description = "Audita a consistência entre spec/plan/tasks (after_tasks com 7 passes adversariais, P05 e Matriz de Migração) ou valida deltas de implementação contra código real (after_implement com Git Diff em 3 camadas e call-sites), emitindo relatório físico e pausa HITL soberana."
+
+[meta]
+version          = "0.0.1"
+hardware_profile = "frontier"
+domain_gates     = []
+model_profile    = "pro"
+
+[hooks]
+before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+after  = []
+
+[tools]
+required = ["read_file", "list_dir", "grep_search", "write_file", "run_command"]
+optional = []
+
+[context]
+reads  = [
+  ".vitalia/feature.json",
+  "specs/*/spec.md",
+  "specs/*/plan.md",
+  "specs/*/tasks.md",
+  "source/",
+  "tests/",
+  ".env"
+]
+writes = ["specs/*/Relatório de Análise e Consistência - *.md"]
+
+[variables]
+input  = ["args", "feature_directory"]
+output = ["analyze_status", "critical_count", "high_count"]
+
+[transport]
+preferred     = "filesystem"
+file_path     = ".vitalia/pipeline.json"
+session_shard = true
+
+[guardian]
+yaml_sources     = ["constitution", "grounding_domains"]
+guardian_profile = "gp_analyze"
+
+prompt = """
+## User Input
+
+```text
+{{args}}
+```
+
+---
+
+## Propósito
+
+Realizar a auditoria de consistência estática e semântica de especificações (`after_tasks`) ou deltas de código implementado (`after_implement`) na IDE Antigravity.
+Opera de forma *read-only* sobre os artefatos e o código de produção, emitindo relatório dual (no chat e em arquivo físico `specs/<feature>/Relatório de Análise e Consistência - <modo>.md`) e exigindo pausa mandatória para consentimento humano soberano (HITL).
+
+---
+
+## Modos de Operação (`--mode=<after_tasks|after_implement>`)
+
+O comando analisa o argumento recebido ou deduz o modo com base no estado da feature ativa em `.vitalia/feature.json`:
+
+### MODO 1: `after_tasks` (Auditoria Pré-Implementação — 7 Passes Adversariais)
+
+Construa o inventário de `FR-xxx`, `SC-xxx`, User Stories, `tasks.md` e regras da Constituição (sem poda) e execute os **7 passes adversariais**:
+1. **A. Duplicações:** FRs ou User Stories semanticamente duplicados.
+2. **B. Ambiguidades:** `SC-xxx` sem métrica observável ou baseados apenas em existência sintática de arquivos; US sem `Independent Test`.
+3. **C. Subespecificação e Omissão de Migração:** FRs sem tasks; US sem fase; componentes existentes refatorados sem entrada na **Matriz de Migração e Preservação Comportamental** no `plan.md` (`CRITICAL`).
+4. **D. Violações da Constituição:** Qualquer elemento do `plan.md` ou `tasks.md` que contradiga `MUST`/`BLOCKING` da Constituição (P00–P17 sem poda), ausência de Medical Gate em saúde (`CRITICAL`) ou ausência do Test Depth Agreement (TDA) no `plan.md`.
+5. **E. Gaps de Cobertura:** FRs com zero tasks associadas (`CRITICAL`) ou tasks órfãs sem rastreabilidade.
+6. **F. Inconsistências de Terminologia e Contrato do Consumidor:** Drift de nomes entre `spec`, `plan` e `tasks`, ou violação de invariantes de diretórios do cliente (ex: criação de `.trash` ou `.vitalia-manifest` dentro de `.agents/skills/`) (`CRITICAL`).
+7. **G. Superficialidade de Testes e Ausência de Cenário de Falsificação (P05):**
+   - Tarefas de teste em `tasks.md` sem tag da Matriz de 4 Modalidades (`[TEST:NEW]`, `[TEST:BUGFIX]`, `[TEST:REFACTOR]`, `[TEST:MIGRATION]`) → `CRITICAL`.
+   - Tarefas de teste sem **Cenário de Falsificação** comportamental explícito → `CRITICAL`.
+   - Tarefas de teste que verificam apenas existência sintática (`assert path.is_file()`) ou strings estáticas em vez de comportamento executável → `CRITICAL`.
+
+### MODO 2: `after_implement` (Auditoria Pós-Implementação / Delta de Código em 3 Camadas)
+
+1. Inspecione os arquivos e linhas modificados na base de código via Git (`git status`, `git diff -U0`).
+2. Execute a **Classificação em 3 Camadas** de cada arquivo e alteração detectada:
+   - **Camada 1 (Previsto no Plano/Task):** Arquivo ou módulo diretamente previsto e mapeado em uma das tarefas `[X]` de `tasks.md`.
+   - **Camada 2 (Adaptação Correlata Necessária):** Ajuste indispensável em módulos adjacentes ou testes provocado pelas alterações (ex: imports, types, fixtures).
+   - **Camada 3 (Órfão Real / Drift Não Autorizado):** Modificação sem correlação técnica com o escopo da feature (`CRITICAL`).
+3. Execute a **Verificação Estática Mandatória de Call-Sites e Contratos**:
+   - Para cada função, método, classe ou script modificado, busque todos os call-sites consumidores no repositório via `grep_search`.
+   - Valide compatibilidade de aridade, parâmetros nomeados, imports e assinaturas.
+   - Verifique se os testes implementados cumprem o TDA e a Matriz de Migração do `plan.md` (rejeitando testes tautológicos `is_file()` como `CRITICAL`).
+
+---
+
+## Emissão Dual do Relatório e Pausa HITL Soberana
+
+1. **Gravação do Artefato Físico:**
+   Salve obrigatoriamente o relatório completo em `specs/<NNN>-<slug>/Relatório de Análise e Consistência - <modo>.md` (com cabeçalho duplo GMT-04:00 — P04), contendo tabelas de cobertura, achados categorizados (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`), classificação em 3 camadas (se `after_implement`) e métricas.
+2. **Apresentação Executiva no Chat:**
+   Exiba o resumo executivo e o link clicável para o relatório físico.
+3. **Gate e Pausa Mandatória para Consentimento Humano (HITL Soberano):**
+   - Se houver qualquer issue `CRITICAL` → declarar `⛔ BLOCKED` (bloqueando `/vitalia-spec-implement` ou encerramento da feature até correção).
+   - Pausar obrigatoriamente aguardando a decisão soberana do desenvolvedor no chat.
+"""
