@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "required": [
+    "schema_version",
+    "last_sync",
+    "shards"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "last_sync": {
+      "type": "string"
+    },
+    "shards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "shard_id",
+          "machine_id",
+          "last_sync"
+        ],
+        "properties": {
+          "shard_id": {
+            "type": "string"
+          },
+          "machine_id": {
+            "type": "string"
+          },
+          "last_sync": {
+            "type": "string"
+          },
+          "total_events": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -93,7 +93,7 @@ Para orientar a sua avaliação com precisão adversarial, utilize os seguintes 
   - `Refatoração Sugerida`: `- [ ] T006 [US1] [TEST:MIGRATION] Criar teste comportamental black-box em tests/test_installer.py — Cenário de Falsificação: falha se a execução do comando instalado via subprocess retornar código != 0, se o clone do repositório remoto falhar ou se o diretório do cliente contiver arquivos fora do contrato.`
 
 ##### Exemplo 3: Tarefa com VIOLAÇÃO CRÍTICA (BLOCK)
-- **Tarefa Auditada:** `- [ ] T012 [US3] Conectar ao serviço de pagamento inserindo API_KEY='sk_live_123' em services/payment.py`
+- **Tarefa Auditada:** `- [ ] T012 [US3] Conectar ao serviço de pagamento inserindo API_KEY='<SAMPLE_KEY_REDACTED>' em services/payment.py`
 - **Contexto Avaliado:** Tentativa de hardcoding de credencial em arquivo de código rastreado pelo Git.
 - **Avaliação:**
   - `Status`: VIOLAÇÃO

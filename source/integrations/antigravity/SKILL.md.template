@@ -1,10 +1,9 @@
-# SKILL.md.template | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:42(GMT-04:00)
 ---
 name: vitalia-{{NAME}}
 description: >
   {{DESCRIPTION}}
 ---
-<!-- SKILL.md | Vitalia SPEC Kit v0.0.1 — gerado por install-project -->
+<!-- SKILL.md | Vitalia SPEC Kit v0.0.1 | 10-11-2026 15:15(GMT-04:00) -->
 <!-- Source: {{VITALIA_KIT_DIR}}/extensions/{{NAME}}.toml -->
 
 # Vitalia: {{NAME}}

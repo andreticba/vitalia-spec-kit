@@ -33,7 +33,7 @@ sanitize_and_generate_skills() {
         vitalia_dir="$(dirname "$(dirname "${skills_dir}")")/.vitalia"
     fi
 
-    local backups_dir="${vitalia_dir}/backups/skills"
+    local backups_dir="${vitalia_dir}/memory/data_storage/backups/skills"
     mkdir -p "${skills_dir}" "${backups_dir}"
 
     local ts
@@ -74,25 +74,26 @@ sanitize_and_generate_skills() {
         fi
     done
 
-    # 4. Gerar as skills ativas a partir de extensions/*.toml
+    # 4. Gerar as skills ativas a partir de extensions/*.toml com normalização idempotente
     for toml_file in "${extensions_dir}"/*.toml; do
         [ -f "${toml_file}" ] || continue
-        local ext_name
-        ext_name="$(basename "${toml_file}" .toml)"
+        local raw_ext_name
+        raw_ext_name="$(basename "${toml_file}" .toml)"
+        local base_name="${raw_ext_name#vitalia-}"
 
         local desc
         desc="$(grep -E '^[[:space:]]*description[[:space:]]*=' "${toml_file}" | head -n 1 | sed -E 's/^[[:space:]]*description[[:space:]]*=[[:space:]]*["'"'"']?//; s/["'"'"'][[:space:]]*$//')"
-        [ -z "${desc}" ] && desc="Workflow ${ext_name} do Vitalia SPEC Kit."
+        [ -z "${desc}" ] && desc="Workflow ${base_name} do Vitalia SPEC Kit."
 
         local rendered
         rendered="$(sed \
-            -e "s|{{NAME}}|${ext_name}|g" \
+            -e "s|{{NAME}}|${base_name}|g" \
             -e "s|{{DESCRIPTION}}|${desc}|g" \
             -e "s|{{VERSION}}|${version}|g" \
             -e "s|{{VITALIA_KIT_DIR}}|${kit_dir}|g" \
             "${template_file}")"
 
-        update_skill "vitalia-${ext_name}" "${rendered}" "${skills_dir}" "${vitalia_dir}"
+        update_skill "vitalia-${base_name}" "${rendered}" "${skills_dir}" "${vitalia_dir}"
     done
 
     return 0

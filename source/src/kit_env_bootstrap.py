@@ -79,28 +79,39 @@ def load_dotenv_native(env_path: Path, override: bool = False) -> Dict[str, str]
 
 def resolve_kit_dir(project_root: Optional[Path] = None) -> Path:
     """
-    Descobre o diretório de instalação do Vitalia SPEC Kit na ordem de precedência:
-    1. Variável de ambiente VITALIA_KIT_DIR
-    2. Chave VITALIA_KIT_DIR no arquivo .env do projeto
-    3. Diretório pai se este script estiver rodando dentro de um kit instalado
-    4. Padrão universal: ~/.vitalia-spec-kit
+    Descobre o diretório de instalação do Vitalia SPEC Kit na ordem de precedência defensiva:
+    1. Variável de ambiente VITALIA_KIT_DIR (se existir fisicamente em disco)
+    2. Chave VITALIA_KIT_DIR no arquivo .env do projeto (se existir fisicamente em disco)
+    3. script_kit_root onde este módulo está instalado (se contiver profiles/constitution.yaml)
+    4. Padrão universal: ~/.vitalia-spec-kit (se existir em disco)
+    5. Fallback final: script_kit_root
     """
+    script_kit_root = Path(__file__).resolve().parent.parent
+
     env_val = os.environ.get("VITALIA_KIT_DIR", "").strip()
     if env_val:
-        return Path(os.path.expanduser(env_val)).resolve()
+        candidate = Path(os.path.expanduser(env_val)).resolve()
+        if candidate.exists():
+            return candidate
 
     if project_root is not None:
         env_file = project_root / ".env"
         if env_file.exists():
             dotenv_vars = load_dotenv_native(env_file, override=False)
-            if dotenv_vars.get("VITALIA_KIT_DIR", "").strip():
-                return Path(os.path.expanduser(dotenv_vars["VITALIA_KIT_DIR"].strip())).resolve()
+            raw_kit_dir = dotenv_vars.get("VITALIA_KIT_DIR", "").strip()
+            if raw_kit_dir:
+                candidate = Path(os.path.expanduser(raw_kit_dir)).resolve()
+                if candidate.exists():
+                    return candidate
 
-    script_kit_root = Path(__file__).resolve().parent.parent
     if (script_kit_root / "profiles" / "constitution.yaml").exists():
         return script_kit_root
 
-    return (Path.home() / ".vitalia-spec-kit").resolve()
+    default_global = (Path.home() / ".vitalia-spec-kit").resolve()
+    if default_global.exists():
+        return default_global
+
+    return script_kit_root
 
 
 def inject_venv(base_dir: Path) -> Tuple[bool, Optional[str]]:

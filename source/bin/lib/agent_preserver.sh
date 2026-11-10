@@ -37,7 +37,7 @@ update_agents_md() {
     mkdir -p "${target_dir}"
 
     if [ -z "${backups_dir}" ]; then
-        backups_dir="$(dirname "${target_dir}")/.vitalia/backups"
+        backups_dir="$(dirname "${target_dir}")/.vitalia/memory/data_storage/backups"
     fi
     mkdir -p "${backups_dir}"
 
@@ -111,7 +111,7 @@ get_manifest_hash() {
     local rel_path="${1:-}"
     local manifest_file="${2:-}"
     [ -f "${manifest_file}" ] || return 0
-    grep -E "[[:space:]]+${rel_path}\$" "${manifest_file}" 2>/dev/null | awk '{print $1}' | head -n 1
+    (grep -E "[[:space:]]+${rel_path}\$" "${manifest_file}" 2>/dev/null || true) | awk '{print $1}' | head -n 1
 }
 
 set_manifest_hash() {
@@ -142,8 +142,8 @@ update_skill() {
     local skill_folder="${skills_dir}/${skill_name}"
     local target_file="${skill_folder}/SKILL.md"
     local rel_path="${skill_name}/SKILL.md"
-    local manifest_file="${vitalia_dir}/.vitalia-manifest"
-    local backups_dir="${vitalia_dir}/backups/skills"
+    local manifest_file="${vitalia_dir}/memory/data_storage/manifests/.vitalia-manifest"
+    local backups_dir="${vitalia_dir}/memory/data_storage/backups/skills"
 
     mkdir -p "${skill_folder}" "${backups_dir}"
     local ts

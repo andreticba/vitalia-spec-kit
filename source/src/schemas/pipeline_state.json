@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "required": [
+    "version",
+    "active_feature",
+    "active_stage",
+    "updated_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "active_feature": {
+      "type": "string"
+    },
+    "active_stage": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "completed_stages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
+

@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "required": [
+    "feature_directory"
+  ],
+  "properties": {
+    "feature_directory": {
+      "type": "string"
+    },
+    "feature_numbering": {
+      "type": "string",
+      "enum": [
+        "sequential",
+        "timestamp"
+      ]
+    }
+  }
+}
+

@@ -97,8 +97,8 @@ echo ""
 # ─────────────────────────────────────────────────────────────
 log_step "1" "Estrutura .vitalia/..."
 mkdir -p "${VITALIA_DIR}/memory/session"
-mkdir -p "${VITALIA_DIR}/memory/data_storage"
-mkdir -p "${VITALIA_DIR}/backups"
+mkdir -p "${VITALIA_DIR}/memory/data_storage/backups/skills"
+mkdir -p "${VITALIA_DIR}/memory/data_storage/manifests"
 
 if [ ! -f "${VITALIA_DIR}/feature.json" ]; then
     echo '{"feature_directory": ""}' > "${VITALIA_DIR}/feature.json"
@@ -180,7 +180,7 @@ if [[ "${INSTALL_AGY}" =~ ^[Ss]$ ]]; then
             -e "s|{{VERSION}}|${VERSION}|g" \
             -e "s|{{VITALIA_KIT_DIR}}|${KIT_DIR}|g" \
             "${KIT_DIR}/AGENTS.md")"
-        update_agents_md "${PROJECT_DIR}/.agents/AGENTS.md" "${kit_agents_content}" "${VITALIA_DIR}/backups"
+        update_agents_md "${PROJECT_DIR}/.agents/AGENTS.md" "${kit_agents_content}" "${VITALIA_DIR}/memory/data_storage/backups"
     fi
 
     log_ok "Antigravity IDE: 16 skills ativas configuradas com pureza total em .agents/skills/"
