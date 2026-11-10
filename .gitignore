@@ -11,6 +11,7 @@
 !.vitalia/memory/data_storage/handoffs/.gitkeep
 handoff_*.json
 context_*_output_*.json
+TEMP/*
 
 # Logs e dependências
 .DS_Store
