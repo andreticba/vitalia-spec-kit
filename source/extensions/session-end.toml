@@ -7,7 +7,7 @@ hardware_profile = "frontier"
 domain_gates = []
 
 [hooks]
-before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+before = ["{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
 after = []
 
 [tools]
@@ -109,7 +109,7 @@ Após a aprovação, não escreva nos arquivos YAML ou JSONL diretamente. Extrai
 
 4. Execute o motor lendo os arquivos gerados:
 ```bash
-python3 {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action end \
+{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action end \
   --task "$(cat .vitalia/temp_task.txt 2>/dev/null || echo 'Sem tarefa')" \
   --p0 "$(cat .vitalia/temp_p0.txt 2>/dev/null || echo 'Sem P0')" \
   --summary "$(cat .vitalia/temp_summary.txt 2>/dev/null || echo '')" \

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# vitalia_hook_runner.py | Vitalia SPEC Kit v0.0.1 | 08-11-2026 20:01(GMT-04:00)
+# vitalia_hook_runner.py | Vitalia SPEC Kit v0.0.1 | 11-11-2026 10:23(GMT-04:00)
 """
 Vitalia Hook Runner — Ponte entre o Vitalia SPEC Kit e a IDE Antigravity.
 
@@ -72,6 +72,15 @@ def _build_guardian_payload(guardian_config: dict, workflow_name: str, cwd: str,
 
 def resolve_placeholders(cmd_template: str, cwd: str, kit_dir: str) -> str:
     cmd = cmd_template
+    kit_path = Path(kit_dir)
+    kit_python = str(kit_env_bootstrap.resolve_kit_python(kit_path))
+
+    project_root = Path(cwd)
+    proj_py = kit_env_bootstrap.find_project_python(project_root)
+    project_python = str(proj_py) if proj_py else kit_python
+
+    cmd = cmd.replace("{{KIT_PYTHON}}", kit_python)
+    cmd = cmd.replace("{{PROJECT_PYTHON}}", project_python)
     cmd = cmd.replace("{{cwd}}", cwd)
     cmd = cmd.replace("{{VITALIA_KIT_DIR}}", kit_dir)
 
@@ -86,6 +95,55 @@ def resolve_placeholders(cmd_template: str, cwd: str, kit_dir: str) -> str:
             except (json.JSONDecodeError, OSError):
                 pass
         cmd = cmd.replace("{{FEATURE_DIR}}", feature_dir)
+
+    return cmd
+
+
+def rewrite_defensive_command(cmd: str, kit_dir: str, cwd: str) -> str:
+    """
+    Auto-substituição defensiva de runtime (FR-002.2 / Decisão D1):
+    Antes de invocar subprocess.run(cmd, shell=True), se o comando invocar 'python3',
+    inspeciona o script alvo .py:
+    - Se residir dentro de kit_dir ou for script do kit, reescreve 'python3' para sys.executable.
+    - Se residir fora de kit_dir (ex: hook customizado do projeto), despacha para PROJECT_PYTHON.
+    """
+    stripped = cmd.strip()
+    if not (stripped.startswith("python3 ") or " python3 " in cmd):
+        return cmd
+
+    kit_path = Path(kit_dir).resolve()
+    parts = cmd.split()
+    is_kit_script = False
+    is_external_script = False
+
+    for part in parts:
+        if part.endswith(".py"):
+            target_path = Path(part)
+            if not target_path.is_absolute():
+                target_path = (Path(cwd) / target_path).resolve()
+            else:
+                target_path = target_path.resolve()
+
+            try:
+                target_path.relative_to(kit_path)
+                is_kit_script = True
+                break
+            except ValueError:
+                is_external_script = True
+
+    if is_kit_script or str(kit_path) in cmd:
+        current_py = sys.executable
+        if stripped.startswith("python3 "):
+            return f"{current_py} " + stripped[len("python3 "):]
+        return cmd.replace(" python3 ", f" {current_py} ")
+
+    if is_external_script:
+        proj_py = kit_env_bootstrap.find_project_python(Path(cwd))
+        if proj_py:
+            target_py = str(proj_py)
+            if stripped.startswith("python3 "):
+                return f"{target_py} " + stripped[len("python3 "):]
+            return cmd.replace(" python3 ", f" {target_py} ")
 
     return cmd
 
@@ -166,10 +224,14 @@ def main():
 
         for cmd_template in hooks:
             cmd = resolve_placeholders(cmd_template, cwd, kit_dir)
+            cmd = rewrite_defensive_command(cmd, kit_dir, cwd)
             print(f"[Hook Runner] Executando hook ({args.phase}): {cmd}", file=sys.stderr)
 
             env_copia = os.environ.copy()
             env_copia["VITALIA_KIT_DIR"] = kit_dir
+            env_copia["VITALIA_KIT_PYTHON"] = str(kit_env_bootstrap.resolve_kit_python(Path(kit_dir)))
+            proj_py = kit_env_bootstrap.find_project_python(Path(cwd))
+            env_copia["VITALIA_PROJECT_PYTHON"] = str(proj_py) if proj_py else env_copia["VITALIA_KIT_PYTHON"]
             model_profile = data.get("meta", {}).get("model_profile", "")
             if model_profile == "pro":
                 gemini_model = os.environ.get("GEMINI_MODEL_PRO", "gemini-3.1-pro-preview")

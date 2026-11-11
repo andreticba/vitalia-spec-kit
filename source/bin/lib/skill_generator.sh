@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# skill_generator.sh | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:56(GMT-04:00)
+# skill_generator.sh | Vitalia SPEC Kit v0.0.1 | 11-11-2026 10:24(GMT-04:00)
 # Geração e higienização estrita de .agents/skills/vitalia-*/SKILL.md mantendo pureza 100% do diretório do cliente.
 # Referência: FR-003, PRES-03/BUG-03, RCA-04a.
 
@@ -85,11 +85,15 @@ sanitize_and_generate_skills() {
         desc="$(grep -E '^[[:space:]]*description[[:space:]]*=' "${toml_file}" | head -n 1 | sed -E 's/^[[:space:]]*description[[:space:]]*=[[:space:]]*["'"'"']?//; s/["'"'"'][[:space:]]*$//')"
         [ -z "${desc}" ] && desc="Workflow ${base_name} do Vitalia SPEC Kit."
 
+        local kit_python="${kit_dir}/.venv/bin/python3"
+        [ ! -f "${kit_python}" ] && kit_python="python3"
+
         local rendered
         rendered="$(sed \
             -e "s|{{NAME}}|${base_name}|g" \
             -e "s|{{DESCRIPTION}}|${desc}|g" \
             -e "s|{{VERSION}}|${version}|g" \
+            -e "s|{{KIT_PYTHON}}|${kit_python}|g" \
             -e "s|{{VITALIA_KIT_DIR}}|${kit_dir}|g" \
             "${template_file}")"
 

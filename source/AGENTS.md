@@ -1,5 +1,5 @@
-<!-- AGENTS.md | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:42(GMT-04:00) -->
-> **AGENTS.md | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:42(GMT-04:00)**
+<!-- AGENTS.md | Vitalia SPEC Kit v0.0.1 | 11-11-2026 10:36(GMT-04:00) -->
+> **AGENTS.md | Vitalia SPEC Kit v0.0.1 | 11-11-2026 10:36(GMT-04:00)**
 
 # AGENTS.md — Vitalia SPEC Kit (v0.0.1)
 
@@ -30,7 +30,7 @@
 5. **Numeração Sequencial de Specs:** Toda feature neste repositório segue estritamente o padrão `specs/<NNN>-<slug>/` com 3 dígitos zero-padded.
 6. **Topologia de 4 Camadas:** Todo código-fonte do kit reside em `source/` (Camada 1) e é instalado em `${VITALIA_KIT_DIR}` (padrão `~/.vitalia-spec-kit/`, Camada 2). O contexto de sessão reside em `.vitalia/memory/session/` (Camada 3, mutado exclusivamente via `vitalia_context_engine.py` — Regra da Cerca Elétrica) e os dados operacionais em `.vitalia/memory/data_storage/` (Camada 4).
 7. **Desativação de CLI Legado (SDD-Judge Nativo na IDE):** NUNCA execute comandos CLI do script legado `sdd_judge.py` no terminal. Quando qualquer workflow solicitar a validação adversarial do SDD-Judge, execute a auditoria **diretamente na IDE como Sub-Agente**, aplicando o Sanduíche Constitucional, FMEA Mental em 4 questões, Inverted CoT e emitindo o Relatório de Inspeção físico com pausa mandatória para aprovação humana (HITL soberano).
-8. **Isolamento de Runtime e Contratos OpenAPI 3.0 (P11):** O kit opera sobre o interpretador Python isolado em `${VITALIA_KIT_DIR}/.venv` sem containers locais (Redis/Postgres). Todos os schemas JSON seguem estritamente o subset OpenAPI 3.0 limpo (sem `$schema`, sem `title` raiz e sem `additionalProperties: false`).
+8. **Isolamento de Runtime, Diretriz de Sandbox da IDE e Veto a Loop de Reinstalação (P11, FR-005):** O kit opera sobre o interpretador Python isolado em `${VITALIA_KIT_DIR}/.venv` sem containers locais (Redis/Postgres). Na IDE Antigravity, comandos de terminal executam sob sandbox restrito ao workspace local; erros com código 127 (`No such file or directory`) ou falhas de permissão ao acessar `${VITALIA_KIT_DIR}/.venv/bin/python3` decorrem exclusivamente do isolamento de sandbox e EXIGEM reexecução imediata com elevação (`BypassSandbox: true`). É TERMINANTEMENTE PROIBIDO e vetado ao agente de IA executar `./kit-bootstrap.sh` ou tentar reinstalar o kit por iniciativa própria diante de falhas de permissão ou sandbox quando o kit já estiver presente em disco. Todos os schemas JSON seguem estritamente o subset OpenAPI 3.0 limpo (sem `$schema`, sem `title` raiz e sem `additionalProperties: false`).
 
 ## Localização do Kit (4 Camadas Isoladas)
 

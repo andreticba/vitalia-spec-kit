@@ -1,0 +1,53 @@
+{
+  "feature": "specs/005-runtime-discrepancy-and-dual-venv",
+  "generated_at": "11-11-2026 09:28(GMT-04:00)",
+  "total_ambiguities": 2,
+  "metrics": {
+    "defect_density_per_100_lines": 0.0,
+    "average_priority_score": 0.0,
+    "status": "ALL_RESOLVED"
+  },
+  "ambiguities": [
+    {
+      "id": "AMB-001",
+      "category": "Incompleteness/Underspecification",
+      "topic": "Escopo da Auto-Substituição Defensiva de python3 no Hook Runner",
+      "section": "FR-002.2",
+      "impact": 4,
+      "uncertainty": 3,
+      "domain_weight": 1.5,
+      "priority_score": 18.0,
+      "status": "RESOLVED",
+      "resolution": "Opção A: Inspecionar o alvo .py. Scripts dentro de kit_dir usam sys.executable; scripts fora usam {{PROJECT_PYTHON}}.",
+      "context": "FR-002.2: se o comando a ser executado contiver python3 {{VITALIA_KIT_DIR}} ou iniciar com python3 direcionado a scripts internos do kit, o runner MUST reescrever defensivamente python3 para sys.executable.",
+      "question": "Como o vitalia_hook_runner.py deve distinguir se um comando iniciado por python3 deve ser reescrito para sys.executable (scripts do Kit) ou mantido/despachado para o interpretador do projeto (scripts customizados do usuário em extensions.yml)?",
+      "recommended_option": "A",
+      "options": {
+        "A": "Verificar se o alvo .py resolve dentro de kit_dir (ou contém {{VITALIA_KIT_DIR}}). Apenas scripts internos do kit usam sys.executable; scripts fora de kit_dir usam {{PROJECT_PYTHON}}.",
+        "B": "Reescrever incondicionalmente qualquer chamada python3 nos hooks para sys.executable.",
+        "C": "Não realizar auto-substituição mágica em runtime, exigindo estritamente que os TOMLs usem {{KIT_PYTHON}} ou {{PROJECT_PYTHON}} explicitamente."
+      }
+    },
+    {
+      "id": "AMB-002",
+      "category": "Referential / Pragmatic",
+      "topic": "Resolução de Caminhos Relativos em PROJECT_VENV_PATH",
+      "section": "FR-001.2",
+      "impact": 3,
+      "uncertainty": 2,
+      "domain_weight": 1.2,
+      "priority_score": 7.2,
+      "status": "RESOLVED",
+      "resolution": "Opção A: Ancorar sempre em relação a project_root ((project_root / path).resolve()).",
+      "context": "FR-001.2 (Nível 2): Chave PROJECT_VENV_PATH declarada no arquivo .env da raiz do projeto.",
+      "question": "Se o desenvolvedor declarar um caminho relativo no .env (ex: PROJECT_VENV_PATH=./meu_venv ou .venv_custom), como ele deve ser ancorado?",
+      "recommended_option": "A",
+      "options": {
+        "A": "Ancorar sempre em relação a project_root ((project_root / path).resolve()), garantindo determinismo mesmo se a IDE ou terminal estiver em um subdiretório.",
+        "B": "Ancorar em relação ao cwd corrente do processo.",
+        "C": "Exigir estritamente caminho absoluto e ignorar caminhos relativos."
+      }
+    }
+  ]
+}
+

@@ -7,7 +7,7 @@ hardware_profile = "frontier"
 domain_gates = []
 
 [hooks]
-before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+before = ["{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
 after = []
 
 [tools]
@@ -63,7 +63,7 @@ Execute `git -C .vitalia/memory/session pull --rebase`.
 Se houver conflito, aborte imediatamente e exiba mensagem solicitando intervenção manual (HITL).
 
 ### Passo 2: Invocar Motor de Contexto
-Execute `python3 {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action consolidate`.
+Execute `{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action consolidate`.
 O script vai checar o semáforo. Se estiver bloqueado (abortar), mostre a mensagem de bloqueio para o usuário e encerre. Se prosseguir, ele adquire o lock, regenera o `README.md` e as views.
 
 ### Passo 3: Exibição de Resumo (Interface)
@@ -107,7 +107,7 @@ O arquivo `.vitalia/memory/session/data/grounding-domains.jsonl` já foi lido no
 
 9. Após todas as decisões, invocar novamente o motor de contexto para regenerar a VIEW `grounding-domains-local.yaml`:
     ```bash
-    python3 {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action consolidate
+    {{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action consolidate
     ```
 
 ### Passo 6: Commit de Sincronização

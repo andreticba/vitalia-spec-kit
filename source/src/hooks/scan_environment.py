@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# scan_environment.py | Vitalia SPEC Kit v0.0.1 | 08-11-2026 20:00(GMT-04:00)
+# scan_environment.py | Vitalia SPEC Kit v0.0.1 | 11-11-2026 10:29(GMT-04:00)
 """
 Executa a varredura do ambiente (via kit_env_bootstrap) e retorna o status em JSON.
 

@@ -9,7 +9,7 @@ hardware_profile = "frontier"
 domain_gates = []
 
 [hooks]
-before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+before = ["{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
 after  = []
 
 [tools]
@@ -97,11 +97,11 @@ Deseja confirmar e prosseguir para este workflow? (Responda "Sim" para executar 
 Quando o usuário confirmar:
 1. Se houver handoff anterior ingerido, marque-o atomicamente como consumido:
    ```bash
-   python3 {{VITALIA_KIT_DIR}}/src/vitalia_handoff.py consume --file "<caminho_do_arquivo_handoff>"
+   {{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_handoff.py consume --file "<caminho_do_arquivo_handoff>"
    ```
 2. Se estiver despachando para um novo workflow especialista ou fallback, registre o novo handoff:
    ```bash
-   python3 {{VITALIA_KIT_DIR}}/src/vitalia_handoff.py create \
+   {{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_handoff.py create \
      --source "vitalia-route" \
      --target "<target_workflow>" \
      --direction "<forward|fallback>" \

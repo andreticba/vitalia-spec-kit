@@ -7,7 +7,7 @@ hardware_profile = "frontier"
 domain_gates = []
 
 [hooks]
-before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+before = ["{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
 after = []
 
 [tools]
@@ -65,8 +65,8 @@ git -C .vitalia/memory/session pull --rebase
 
 ### Passo 2: Inicialização/Consolidação do Motor de Contexto
 Verifique a existência da pasta `.vitalia/memory/session/data/`:
-- Se NÃO existir: execute `python3 {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action init`
-- Se EXISTIR: execute `python3 {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action consolidate`
+- Se NÃO existir: execute `{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action init`
+- Se EXISTIR: execute `{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_context_engine.py --action consolidate`
 *(Isso garantirá que o Dashboard visual e os arquivos MD estejam reconstruídos).*
 
 ### Passo 3: Ler o Dashboard e Estado

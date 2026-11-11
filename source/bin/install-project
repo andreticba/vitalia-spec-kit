@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install-project | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:56(GMT-04:00)
+# install-project | Vitalia SPEC Kit v0.0.1 | 11-11-2026 10:25(GMT-04:00)
 # Ativa o Vitalia SPEC Kit num projeto hospedeiro específico.
 # Referência: FR-003, PRES-02/BUG-02, PRES-03/BUG-03, RCA-04a, RCA-04b.
 
@@ -7,7 +7,17 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_DIR="${SCRIPT_DIR}/lib"
-DEFAULT_KIT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PARENT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+if [ -d "${HOME}/.vitalia-spec-kit/.venv" ]; then
+    DEFAULT_KIT_DIR="${HOME}/.vitalia-spec-kit"
+elif [ -d "${PARENT_DIR}/.venv" ]; then
+    DEFAULT_KIT_DIR="${PARENT_DIR}"
+elif [ -d "${HOME}/.vitalia-spec-kit" ]; then
+    DEFAULT_KIT_DIR="${HOME}/.vitalia-spec-kit"
+else
+    DEFAULT_KIT_DIR="${PARENT_DIR}"
+fi
 KIT_DIR="${VITALIA_KIT_DIR:-${DEFAULT_KIT_DIR}}"
 
 SESSION_REPO=""

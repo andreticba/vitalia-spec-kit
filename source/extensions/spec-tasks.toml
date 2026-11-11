@@ -8,7 +8,7 @@ domain_gates     = []
 model_profile    = "pro"
 
 [hooks]
-before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+before = ["{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
 after  = []
 
 [tools]
@@ -144,11 +144,11 @@ Para **TODA tarefa de teste**, é OBRIGATÓRIO incluir a tag da **Matriz de Test
 *Verificações de ambiente e grounding ANTES de qualquer implementação. Sem label de US.*
 *Adaptar T000-D conforme libs citadas na spec. Para projetos sem venv (ex: tooling puro), marcar T000-A/B como N/A.*
 
-- [ ] T000-A Ativar venv: `source .venv/bin/activate` (ou equivalente do projeto)
-- [ ] T000-B Verificar versão Python do venv (não do sistema): `python --version`
-- [ ] T000-C Verificar deps instaladas vs requirements.txt: `pip list --outdated` ou equivalente
+- [ ] T000-A Verificar interpretador do projeto: `{{PROJECT_PYTHON}} --version` (ou N/A para tooling sem venv)
+- [ ] T000-B Verificar integridade de dependências do projeto: `{{PROJECT_PYTHON}} -m pip check`
+- [ ] T000-C Verificar deps instaladas vs requirements.txt: `{{PROJECT_PYTHON}} -m pip list --outdated` ou equivalente
 - [ ] T000-D [Para cada lib externa na spec] Verificar versão atual em pypi.org
-- [ ] T000-E Verificar conflitos de compatibilidade entre libs: `pip check`
+- [ ] T000-E Verificar conflitos de compatibilidade entre libs: `{{PROJECT_PYTHON}} -m pip check`
 
 ---
 

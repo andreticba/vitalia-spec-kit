@@ -8,7 +8,7 @@ domain_gates = []
 model_profile = "pro"
 
 [hooks]
-before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+before = ["{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
 after  = []
 
 [tools]

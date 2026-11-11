@@ -10,7 +10,7 @@ hardware_profile = "frontier"
 domain_gates = []
 
 [hooks]
-before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+before = ["{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
 after  = []
 
 [tools]
@@ -180,7 +180,7 @@ Quando todas as decisões estiverem tomadas e validadas com o usuário:
 2. **Gerar Handoff Local Progressivo (Direction: Forward):**
    Executar o utilitário de handoff para registrar a transição determinística:
    ```bash
-   python3 {{VITALIA_KIT_DIR}}/src/vitalia_handoff.py create \
+   {{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_handoff.py create \
      --source "brainstorming" \
      --target "route" \
      --direction "forward" \

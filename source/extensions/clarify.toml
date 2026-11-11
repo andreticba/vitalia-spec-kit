@@ -7,7 +7,7 @@ hardware_profile = "frontier"
 domain_gates     = []
 
 [hooks]
-before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
+before = ["{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]
 after  = []
 
 [tools]

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# kit_env_bootstrap.py | Vitalia SPEC Kit v0.0.1 | 08-11-2026 20:00(GMT-04:00)
+# kit_env_bootstrap.py | Vitalia SPEC Kit v0.0.1 | 11-11-2026 10:08(GMT-04:00)
 """
 Módulo Central de Bootstrap de Ambiente — Vitalia SPEC Kit v0.0.1
 
@@ -82,8 +82,8 @@ def resolve_kit_dir(project_root: Optional[Path] = None) -> Path:
     Descobre o diretório de instalação do Vitalia SPEC Kit na ordem de precedência defensiva:
     1. Variável de ambiente VITALIA_KIT_DIR (se existir fisicamente em disco)
     2. Chave VITALIA_KIT_DIR no arquivo .env do projeto (se existir fisicamente em disco)
-    3. script_kit_root onde este módulo está instalado (se contiver profiles/constitution.yaml)
-    4. Padrão universal: ~/.vitalia-spec-kit (se existir em disco)
+    3. Padrão universal: ~/.vitalia-spec-kit (se existir em disco)
+    4. Fallback defensivo: script_kit_root (se contiver profiles/constitution.yaml)
     5. Fallback final: script_kit_root
     """
     script_kit_root = Path(__file__).resolve().parent.parent
@@ -104,14 +104,105 @@ def resolve_kit_dir(project_root: Optional[Path] = None) -> Path:
                 if candidate.exists():
                     return candidate
 
-    if (script_kit_root / "profiles" / "constitution.yaml").exists():
-        return script_kit_root
-
     default_global = (Path.home() / ".vitalia-spec-kit").resolve()
     if default_global.exists():
         return default_global
 
+    if (script_kit_root / "profiles" / "constitution.yaml").exists():
+        return script_kit_root
+
     return script_kit_root
+
+
+def resolve_kit_python(kit_dir: Path) -> Path:
+    """
+    Localiza o binário do interpretador Python isolado do kit (${VITALIA_KIT_DIR}/.venv).
+    Suporta convenções POSIX (bin/python3, bin/python) e Windows (Scripts/python.exe, Scripts/python3.exe).
+    Retorna o caminho absoluto sem seguir symlinks para preservar o sys.prefix de PEP 405.
+    Fallback defensivo para sys.executable.
+    """
+    venv_dir = kit_dir / ".venv"
+    candidates = [
+        venv_dir / "bin" / "python3",
+        venv_dir / "bin" / "python",
+        venv_dir / "Scripts" / "python.exe",
+        venv_dir / "Scripts" / "python3.exe",
+    ]
+    for c in candidates:
+        if c.exists() and (os.access(c, os.X_OK) or os.name == "nt"):
+            return Path(os.path.abspath(c))
+    return Path(os.path.abspath(sys.executable))
+
+
+def _resolve_venv_python_bin(venv_dir: Path) -> Optional[Path]:
+    """Helper interno para localizar o executável python dentro de uma pasta venv."""
+    candidates = [
+        venv_dir / "bin" / "python3",
+        venv_dir / "bin" / "python",
+        venv_dir / "Scripts" / "python.exe",
+        venv_dir / "Scripts" / "python3.exe",
+    ]
+    for c in candidates:
+        if c.exists() and (os.access(c, os.X_OK) or os.name == "nt"):
+            return Path(os.path.abspath(c))
+    return None
+
+
+def find_project_python_details(project_root: Optional[Path] = None) -> Tuple[bool, Optional[str], str]:
+    """
+    Algoritmo de descoberta em 4 níveis do ambiente virtual do projeto (FR-001.2 / cli-contracts.md):
+    1. $VIRTUAL_ENV ativo no ambiente -> ("shell_env")
+    2. Chave PROJECT_VENV_PATH no .env da raiz do projeto -> ("dotenv_config")
+    3. Varredura por pastas canônicas (.venv, venv, env, .env_py) na raiz do projeto -> ("canonical_folder")
+    4. Resolução determinística do executável POSIX ou Windows sem seguir symlinks.
+    Retorna: (has_venv: bool, python_bin: Optional[str], source_detected: str)
+    """
+    # Nível 1: $VIRTUAL_ENV ativo no shell
+    env_virtual_env = os.environ.get("VIRTUAL_ENV", "").strip()
+    if env_virtual_env:
+        vpath = Path(os.path.expanduser(env_virtual_env))
+        py_bin = _resolve_venv_python_bin(vpath)
+        if py_bin:
+            return True, str(py_bin), "shell_env"
+
+    if project_root is None:
+        project_root = find_project_root()
+    else:
+        project_root = Path(project_root).resolve()
+
+    # Nível 2: Chave PROJECT_VENV_PATH no .env do projeto
+    env_file = project_root / ".env"
+    if env_file.exists():
+        dotenv_vars = load_dotenv_native(env_file, override=False)
+        proj_venv_raw = dotenv_vars.get("PROJECT_VENV_PATH", "").strip()
+        if proj_venv_raw:
+            raw_path = Path(os.path.expanduser(proj_venv_raw))
+            if not raw_path.is_absolute():
+                candidate_venv = (project_root / raw_path).resolve()
+            else:
+                candidate_venv = raw_path.resolve()
+            py_bin = _resolve_venv_python_bin(candidate_venv)
+            if py_bin:
+                return True, str(py_bin), "dotenv_config"
+
+    # Nível 3 & 4: Varredura por diretórios canônicos locais na raiz do projeto
+    canonical_names = [".venv", "venv", "env", ".env_py"]
+    for cname in canonical_names:
+        candidate_venv = project_root / cname
+        if candidate_venv.exists() and candidate_venv.is_dir():
+            py_bin = _resolve_venv_python_bin(candidate_venv)
+            if py_bin:
+                return True, str(py_bin), "canonical_folder"
+
+    return False, None, "not_found"
+
+
+def find_project_python(project_root: Optional[Path] = None) -> Optional[Path]:
+    """Retorna a instância Path do executável python do projeto ou None se não encontrado."""
+    has_venv, py_str, _ = find_project_python_details(project_root)
+    if has_venv and py_str:
+        return Path(py_str)
+    return None
 
 
 def inject_venv(base_dir: Path) -> Tuple[bool, Optional[str]]:
@@ -145,8 +236,9 @@ def inject_venv(base_dir: Path) -> Tuple[bool, Optional[str]]:
 
 def check_environment_health(project_root: Path) -> Dict[str, Any]:
     """
-    Diagnostica a saúde do ambiente do projeto sem exigir containers locais (Redis/Postgres)
-    nem .venv obrigatório no projeto hospedeiro (pois o kit possui seu próprio .venv isolado).
+    Diagnostica a saúde do ambiente em formato estruturado OpenAPI 3.0 segregado (FR-001.3 / P15):
+    - kit_runtime: saúde do interpretador do kit e integridade dos pacotes essenciais
+    - project_runtime: descoberta em 4 níveis do ambiente virtual da aplicação hospedeira
     """
     if isinstance(project_root, str):
         project_root = Path(project_root)
@@ -155,15 +247,44 @@ def check_environment_health(project_root: Path) -> Dict[str, Any]:
     has_env = env_file.exists() and env_file.is_file()
 
     kit_dir = resolve_kit_dir(project_root)
-    kit_venv_ok, kit_venv_path = inject_venv(kit_dir)
-    proj_venv_ok, proj_venv_path = inject_venv(project_root)
+    kit_py = resolve_kit_python(kit_dir)
+    inject_venv(kit_dir)
+    inject_venv(project_root)
 
-    venv_ok = kit_venv_ok or proj_venv_ok
-    venv_path = kit_venv_path or proj_venv_path
+    has_proj_venv, proj_py, source_detected = find_project_python_details(project_root)
 
     issues = []
     if not has_env:
         issues.append("Arquivo .env ausente na raiz do projeto")
+
+    # Auditoria de integridade de pacotes do kit (FR-001.1)
+    kit_status = "HEALTHY"
+    try:
+        import yaml, jinja2, jsonschema  # noqa: F401
+    except ImportError as e:
+        kit_status = "DEGRADED"
+        issues.append(f"Pacotes essenciais do kit ausentes no interpretador {kit_py}: {e}")
+
+    status = "HEALTHY" if not issues else "DEGRADED"
+
+    return {
+        "status": status,
+        "project_root": str(project_root),
+        "kit_dir": str(kit_dir),
+        "kit_runtime": {
+            "kit_dir": str(kit_dir),
+            "python_bin": str(kit_py),
+            "status": kit_status,
+        },
+        "project_runtime": {
+            "project_root": str(project_root),
+            "has_venv": has_proj_venv,
+            "python_bin": proj_py,
+            "source_detected": source_detected,
+        },
+        "has_env": has_env,
+        "issues": issues,
+    }
 
     status = "HEALTHY" if not issues else "DEGRADED"
 

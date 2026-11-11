@@ -8,7 +8,7 @@ domain_gates     = []
 model_profile    = "pro"
 
 [hooks]
-before = ["python3 {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]   # pair mode pode ser injetado aqui via extensions.yml
+before = ["{{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/hooks/scan_environment.py"]   # pair mode pode ser injetado aqui via extensions.yml
 after  = []
 
 [tools]
@@ -89,11 +89,9 @@ Escanear todos os arquivos em `{feature_directory}/checklists/`:
 Antes de escrever qualquer código:
 
 0. **Ambiente Python** (se projeto usa Python — verificar via plan.md):
-   - Localizar e ativar o venv: `source .venv/bin/activate` (ou equivalente)
-   - **Verificar Python do venv** (não do sistema): `python --version`
-     → O resultado deve coincidir com o Python declarado no plan.md
-   - Verificar deps instaladas vs requirements.txt
-   - Rodar `pip check` para detectar conflitos de compatibilidade entre libs
+   - Localizar e utilizar o runtime do projeto (`{{PROJECT_PYTHON}}`): `{{PROJECT_PYTHON}} --version`
+   - Verificar deps instaladas vs requirements.txt da aplicação
+   - Rodar `{{PROJECT_PYTHON}} -m pip check` para detectar conflitos de compatibilidade entre libs
    - **Para toda lib nova** que será adicionada ao requirements: pesquisar versão atual em
      pypi.org antes de escrever o `pip install` — nunca assumir versão pelo conhecimento interno
 
@@ -116,12 +114,12 @@ Para cada fase no tasks.md:
     → Marcar como em andamento: - [/] T001 ...
     → SE a task for de TESTE ([TEST:NEW], [TEST:BUGFIX], [TEST:REFACTOR], [TEST:MIGRATION]):
       1. Proibido escrever testes tautológicos/sintáticos (ex: apenas `assert path.is_file()`). O teste DEVE exercitar o comportamento executável e o Cenário de Falsificação declarado.
-      2. Para `[TEST:NEW]` e `[TEST:BUGFIX]`: executar o teste via `pytest` no terminal ANTES de implementar o código/fix e confirmar empiricamente que ele FALHA pelo motivo de negócio esperado (Red Phase / Bug Reproduction). Se o teste já passar sozinho antes da correção, ele é um FALSO POSITIVO e deve ser reescrito.
+      2. Para `[TEST:NEW]` e `[TEST:BUGFIX]`: executar o teste via `{{PROJECT_PYTHON}} -m pytest` no terminal ANTES de implementar o código/fix e confirmar empiricamente que ele FALHA pelo motivo de negócio esperado (Red Phase / Bug Reproduction). Se o teste já passar sozinho antes da correção, ele é um FALSO POSITIVO e deve ser reescrito.
       3. Para `[TEST:REFACTOR]` e `[TEST:MIGRATION]`: garantir cobertura das invariantes de preservação comportamental documentadas na Matriz de Migração do `plan.md`.
     → SE a task for de IMPLEMENTAÇÃO / REFATORAÇÃO:
       1. Proibido reescrever código legado cegamente omitindo comportamentos estáveis mapeados na Matriz de Migração do `plan.md`.
       2. Respeitar estritamente a pureza dos diretórios e contratos do consumidor (ex: zero arquivos ocultos ou `.trash` em `.agents/skills/`).
-      3. Executar a bateria de testes correspondente no terminal e comprovar código de saída 0 (Green Phase).
+      3. Executar a bateria de testes correspondente no terminal com `{{PROJECT_PYTHON}} -m pytest` e comprovar código de saída 0 (Green Phase).
     → Ao concluir e comprovar em execução: marcar - [X] T001 ...
     → Reportar: "✅ T001: [arquivo criado/modificado + resultado da execução do teste]"
 

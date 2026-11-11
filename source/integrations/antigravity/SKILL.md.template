@@ -3,7 +3,7 @@ name: vitalia-{{NAME}}
 description: >
   {{DESCRIPTION}}
 ---
-<!-- SKILL.md | Vitalia SPEC Kit v0.0.1 | 10-11-2026 15:15(GMT-04:00) -->
+<!-- SKILL.md | Vitalia SPEC Kit v0.0.1 | 11-11-2026 10:37(GMT-04:00) -->
 <!-- Source: {{VITALIA_KIT_DIR}}/extensions/{{NAME}}.toml -->
 
 # Vitalia: {{NAME}}
@@ -12,8 +12,9 @@ Ao acionar este comando:
 
 1. Execute o script nativo no interpretador isolado do kit para invocar os hooks e iniciar o processo de extração de contexto (§11 Context Lifting sem poda):
    ```bash
-   {{VITALIA_KIT_DIR}}/.venv/bin/python3 {{VITALIA_KIT_DIR}}/src/vitalia_hook_runner.py {{VITALIA_KIT_DIR}}/extensions/{{NAME}}.toml --phase before --args="{{args}}"
+   {{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_hook_runner.py {{VITALIA_KIT_DIR}}/extensions/{{NAME}}.toml --phase before --args="{{args}}"
    ```
+   > ℹ️ **Nota de Sandbox (IDE Antigravity):** Caso o terminal retorne código 127 (`No such file or directory`), o erro decorre da restrição de sandbox da IDE. Reexecute o comando com elevação (`BypassSandbox: true`). Jamais execute `kit-bootstrap.sh` para contornar restrições de sandbox.
 2. O script ejetará no stdout um **Stub JSON**. Extraia o caminho contido no campo `workflow_context_file` (localizado em `.vitalia/memory/data_storage/context/<machine_id>/`).
 3. Utilize a ferramenta `view_file` (ou `read_file`) para ler o arquivo JSON físico referenciado.
 4. O arquivo lido conterá duas chaves fundamentais: `prompt` (dentro de `guardian.prompt` ou raiz) e `guardian_json`.
