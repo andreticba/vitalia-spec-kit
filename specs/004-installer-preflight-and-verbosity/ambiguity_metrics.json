@@ -1,0 +1,73 @@
+{
+  "feature": "specs/004-installer-preflight-and-verbosity",
+  "generated_at": "10-11-2026 19:24(GMT-04:00)",
+  "total_ambiguities": 3,
+  "metrics": {
+    "defect_density_per_100_lines": 0.0,
+    "average_priority_score": 0.0,
+    "status": "ALL_RESOLVED"
+  },
+  "ambiguities": [
+    {
+      "id": "AMB-001",
+      "category": "Incompleteness/Underspecification",
+      "topic": "Validação de Escrita em Diretórios Alvo Inexistentes",
+      "section": "FR-001.3",
+      "impact": 4,
+      "uncertainty": 3,
+      "domain_weight": 1.5,
+      "priority_score": 18.0,
+      "status": "RESOLVED",
+      "resolution": "Opção A: Verificação no primeiro ancestral existente via arquivo temporário de probe.",
+      "context": "FR-001.3: testar a capacidade de escrita em todos os diretórios de destino antes de qualquer modificação em disco (para o bootstrap: diretório do kit e ~/.local/bin)",
+      "question": "Se o diretório ~/.local/bin ou o diretório de destino do kit (~/.vitalia-spec-kit) ainda não existirem no sistema de arquivos, como o pre-flight check deve atestar a permissão de escrita?",
+      "recommended_option": "A",
+      "options": {
+        "A": "Verificar recursivamente o primeiro diretório ancestral existente (ex: $HOME) testando a criação e remoção de arquivo temporário de probe (touch probe && rm probe).",
+        "B": "Tentar criar o diretório diretamente com mkdir -p e, se falhar, emitir erro e abortar.",
+        "C": "Apenas verificar a flag de permissão [ -w ] do diretório $HOME sem tocar no filesystem."
+      }
+    },
+    {
+      "id": "AMB-002",
+      "category": "Consumer Contract / Security",
+      "topic": "Isolamento de Log em /tmp e Prevenção de Colisão Multi-Usuário",
+      "section": "FR-003",
+      "impact": 4,
+      "uncertainty": 2,
+      "domain_weight": 1.4,
+      "priority_score": 11.2,
+      "status": "RESOLVED",
+      "resolution": "Opção A: Log em /tmp/vitalia-bootstrap-${UID}.log com fallback via mktemp.",
+      "context": "FR-003: As saídas detalhadas de ferramentas externas (pip, comandos de compilação) MUST ser redirecionadas para arquivos de log em /tmp/vitalia-bootstrap.log.",
+      "question": "Em ambientes compartilhados ou servidores multi-usuário (onde /tmp tem sticky bit 1777), um arquivo fixo /tmp/vitalia-bootstrap.log pode gerar Permission Denied se criado previamente por outro usuário. Como estruturar o caminho do log?",
+      "recommended_option": "A",
+      "options": {
+        "A": "Usar sufixo de identificador de usuário /tmp/vitalia-bootstrap-${UID:-$(id -u)}.log com fallback para mktemp se houver colisão de escrita.",
+        "B": "Manter o caminho fixo /tmp/vitalia-bootstrap.log sobrescrevendo sempre.",
+        "C": "Gravar o log dentro do próprio diretório do kit (${TARGET_KIT_DIR}/install.log)."
+      }
+    },
+    {
+      "id": "AMB-003",
+      "category": "Pragmatic / UX",
+      "topic": "Detecção Dinâmica do Shell Ativo no Banner Pós-Instalação",
+      "section": "FR-004",
+      "impact": 2,
+      "uncertainty": 2,
+      "domain_weight": 1.0,
+      "priority_score": 4.0,
+      "status": "RESOLVED",
+      "resolution": "Opção A: Detecção dinâmica de Bash vs Zsh no banner.",
+      "context": "FR-004: O instalador MUST imprimir um banner final de destaque visual instruindo o usuário a recarregar o shell ativo com o comando exato: source ~/.bashrc ou source ~/.zshrc",
+      "question": "Como o banner final deve orientar o comando de recarregamento do shell ativo?",
+      "recommended_option": "A",
+      "options": {
+        "A": "Detectar o shell corrente via $SHELL / $ZSH_VERSION / $BASH_VERSION e exibir especificamente a linha relevante (ex: 'source ~/.zshrc' se Zsh, ou 'source ~/.bashrc' se Bash), mantendo a menção alternativa em subtítulo.",
+        "B": "Exibir ambas as linhas estaticamente sem detecção dinâmica.",
+        "C": "Sugerir apenas reiniciar o terminal sem comando source."
+      }
+    }
+  ]
+}
+

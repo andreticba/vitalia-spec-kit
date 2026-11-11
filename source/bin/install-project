@@ -13,6 +13,7 @@ KIT_DIR="${VITALIA_KIT_DIR:-${DEFAULT_KIT_DIR}}"
 SESSION_REPO=""
 DATA_REPO=""
 NON_INTERACTIVE=0
+VERBOSE=0
 INSTALL_AGY="S"
 INSTALL_GEMINI_CLI="n"
 
@@ -24,6 +25,7 @@ Opções:
   --session-repo <URL>  URL ou caminho do repositório Git de sessão (.vitalia/memory/session)
   --data-repo <URL>     URL ou caminho do repositório Git de dados (.vitalia/memory/data_storage)
   --non-interactive     Executa sem prompts interativos
+  -v, --verbose         Habilita verbosidade estendida
   -h, --help            Exibe esta mensagem de ajuda
 EOF
 }
@@ -50,6 +52,10 @@ while [ $# -gt 0 ]; do
             NON_INTERACTIVE=1
             shift
             ;;
+        -v|--verbose)
+            VERBOSE=1
+            shift
+            ;;
         -h|--help)
             usage
             exit 0
@@ -62,7 +68,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-for lib in logger.sh env_manager.sh agent_preserver.sh skill_generator.sh git_storage_manager.sh; do
+for lib in preflight.sh logger.sh env_manager.sh agent_preserver.sh skill_generator.sh git_storage_manager.sh; do
     if [ -f "${LIB_DIR}/${lib}" ]; then
         # shellcheck source=/dev/null
         source "${LIB_DIR}/${lib}"
@@ -91,6 +97,16 @@ echo "╚═══════════════════════�
 echo "📂 Projeto: $(basename "${PROJECT_DIR}")"
 echo "📦 Kit: ${KIT_DIR} (v${VERSION})"
 echo ""
+
+# ─────────────────────────────────────────────────────────────
+# PASSO 0: Pre-Flight Check de Projeto (FR-005)
+# ─────────────────────────────────────────────────────────────
+log_step "0" "Pre-Flight Check do Projeto..."
+check_python_version_semver 3 10
+check_writable_target "${PROJECT_DIR}"
+check_writable_target "${PROJECT_DIR}/.agents/skills"
+check_git_requirements "${SESSION_REPO}" "${DATA_REPO}"
+log_ok "Pré-requisitos e permissões de escrita validados com sucesso."
 
 # ─────────────────────────────────────────────────────────────
 # PASSO 1: Criar estrutura .vitalia/
