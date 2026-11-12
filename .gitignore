@@ -43,3 +43,4 @@ htmlcov/
 *.swp
 INSTRUCOES-INICIALIZACAO.md.vitalia/backups/
 .vitalia/.vitalia-manifest
+vitalia-spec-kit/

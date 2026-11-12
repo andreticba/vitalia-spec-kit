@@ -127,9 +127,9 @@ Gravar em `.vitalia/feature.json`:
 
   <grounding_rules>
   Ao preencher "## Suposições Verificadas" e os Critérios de Aceite:
-  1. NUNCA afirme versões de pacotes, APIs, contratos de cliente (ex: Antigravity IDE) ou modelos LLM sem busca externa prévia via Sub-Agente com acesso à rede (`define_subagent` `vitalia-researcher` ou `self` — NUNCA use o subagente `research` built-in sem rede para busca web).
-  2. NUNCA cite URLs de memória — verifique HTTP 200 real e leia o conteúdo integral da página/documentação oficial para detectar avisos de depreciação ou páginas mais recentes.
-  3. NUNCA defina Success Criteria (SC-xxx) ou Acceptance Scenarios (Given/When/Then) baseados na mera presença de arquivos ou strings estáticas; todo critério DEVE especificar o comportamento funcional observável em execução e as invariantes de pureza do contrato do consumidor.
+  1. Barreira Síncrona Obrigatória de Orquestração: Ao delegar buscas ou validações a um subagente (`vitalia-researcher` ou `self` com acesso à rede), suspenda a resposta até o retorno completo do subagente. Toda citação de versão, documentação, endpoint ou alegação científica exige confirmação de link ativo (HTTP 200) seguida de leitura integral da fonte.
+  2. Afirmações de versões de pacotes, APIs, contratos de cliente (ex: Antigravity IDE) ou modelos LLM apoiam-se em busca externa prévia com Rastro de Pesquisa auditável.
+  3. Critérios de Sucesso (SC-xxx) e Cenários de Aceite (Given/When/Then) definem-se exclusivamente através de comportamentos observáveis de negócio, fluxos funcionais em execução e contratos do consumidor.
   4. Quando a feature envolver correção de bugs ou migração/refatoração de componentes existentes, inclua uma seção `## Comportamentos Existentes a Preservar & Defeitos a Reproduzir`.
   Ver regra completa: profiles/grounding_domains.yaml e guardian_json.phase_guardrails.
   </grounding_rules>

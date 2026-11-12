@@ -2,7 +2,7 @@
 # Schema: Dual-Index (Opção D) — O(1) lookup por domain_id e principle_id
 # Fontes: docs/rules/always-on/*.md + docs/rules/file-triggered/*.md
 #         + OWASP LLM Top 10 2025 + EU AI Act Art.12 + CMAG 2025/2026
-# Princípios: P00–P17 (18 princípios, 12 domínios)
+# Princípios: Catálogo dinâmico integral sem poda (lookup O(1) por domínio)
 # Validar com: python3 -m jsonschema --instance profiles/constitution.yaml src/schemas/constitution.schema.json
 
 schema_type: "constitution"
@@ -44,9 +44,10 @@ principles:
     domain: "GOVERNANCE"
     severity: "BLOCKING"
     rule: >
-      Nunca implementar código sem tasks.md aprovado. Pipeline obrigatório:
+      A implementação de código ocorre exclusivamente sobre tasks.md aprovado
+      e auditado. O avanço do pipeline observa a sequência canônica:
       specify → plan → tasks → implement → converge. Em domínios de saúde,
-      spec inclui o medical-gate (P09) antes do plan.
+      a especificação incorpora o medical-gate (P09) antes do planejamento.
     rationale: >
       Código sem spec é dívida técnica não rastreável. O Task Verifier
       garante que cada linha tem origem em requisito aprovado pelo usuário.
@@ -70,12 +71,13 @@ principles:
     domain: "GROUNDING"
     severity: "WARNING"
     rule: >
-      Versões de pacotes, endpoints de API, preços cloud, referências
-      científicas e CVEs exigem busca externa prévia e Rastro de Pesquisa
-      no artefato. Comportamento real de APIs validado antes de implementar.
+      Toda citação de versão, documentação, endpoint ou alegação científica
+      exige confirmação de link ativo (HTTP 200) seguida de leitura integral
+      da fonte e inclusão do Rastro de Pesquisa no artefato.
     rationale: >
-      LLMs alucinam versões e URLs. Em saúde, um pacote desatualizado
-      pode ter consequências clínicas. "Confiar sem verificar" é falha.
+      Modelos de IA têm data de corte de conhecimento e alucinam versões,
+      parâmetros de API e fatos científicos. Busca externa com Rastro de
+      Pesquisa auditável (P03) ancora o sistema na realidade.
     validator: "hooks/guardian_context.py"
 
   P04:
@@ -111,10 +113,10 @@ principles:
       (4) [TEST:MIGRATION] (Adaptação/Desacoplamento Arquitetural): Contract Preservation + Clean Purge —
       combina Characterization Test das intenções de negócio que devem sobreviver à mudança arquitetural
       com asserções provando a purga da infraestrutura legada e a pureza do contrato do consumidor.
-      Toda tarefa de teste em tasks.md DEVE declarar sua modalidade e seu Cenário de Falsificação
-      (qual comportamento de negócio real fará o teste falhar). É ESTRITAMENTE PROIBIDO (BLOCKING)
-      usar asserções puramente sintáticas/estáticas isoladas (como assert path.is_file() ou
-      assert "string" in path.read_text()) para atestar conclusão de funcionalidade ou bugfix.
+      Toda tarefa de teste em tasks.md declara sua modalidade e seu Cenário de Falsificação
+      (qual comportamento de negócio real fará o teste falhar). A validação de conclusão de tarefas
+      e bugfixes baseia-se exclusivamente em asserções comportamentais executáveis de caixa-preta
+      que exercitam o fluxo funcional do componente.
     rationale: >
       Testes que verificam apenas existência de arquivos ou strings criam falsos positivos
       ("teatro de conformidade") enquanto o sistema falha em execução real. A Matriz de 4 Modalidades
@@ -123,13 +125,13 @@ principles:
     validator: "/vitalia-judge"
 
   P06:
-    name: "Secrets Never in Git"
+    name: "Secrets Governance & Vault Storage"
     domain: "SECRETS"
     severity: "BLOCKING"
     rule: >
-      Credenciais, chaves e senhas existem apenas em .env locais ou vaults.
-      Nenhum segredo entra em commits, logs ou outputs de console.
-      Migrações de banco são não-destrutivas e idempotentes.
+      Credenciais, chaves e senhas residem exclusivamente em .env locais protegidos ou cofres seguros (vaults).
+      Commits, logs e saídas de console contêm apenas valores sanitizados ou mascarados.
+      Migrações de dados e configurações de banco são concebidas como transações não-destrutivas e idempotentes.
     rationale: >
       Segredo em git é permanente — o histórico não apaga. Em sistemas
       de saúde com PHI/PII, constitui breach reportável (LGPD Art. 48).
@@ -196,13 +198,12 @@ principles:
     domain: "HARDWARE_AGNOSTICISM"
     severity: "BLOCKING"
     rule: >
-      Nenhum nome de modelo LLM hardcoded — vem de .env (NO1_MODEL,
-      NO2_MODEL, ROUTER_LLM_PROFILE etc.). Todo contrato de schema JSON no sistema
-      deve seguir estritamente o subset OpenAPI 3.0 limpo, sendo terminantemente proibidos
-      meta-campos incompatíveis com compiladores REST de LLM como '$schema', 'title' e
-      'additionalProperties: false'. Instâncias de runtime (.vitalia/*.json) são dados planos,
-      nunca definições de schemas. Nenhum machine_id hardcoded — deriva de VITALIA_MACHINE_NAME
-      env var ou socket.gethostname() via SHA256[:8]. Builds reprodutíveis: local = produção.
+      Nomes de modelos LLM configuram-se dinamicamente a partir de variáveis de ambiente
+      (NO1_MODEL, NO2_MODEL, ROUTER_LLM_PROFILE etc.). Todo contrato de schema JSON no sistema
+      segue estritamente o subset OpenAPI 3.0 limpo (campos planos, sem '$schema', sem 'title' raiz
+      e sem 'additionalProperties: false'). Instâncias de runtime (.vitalia/*.json) são dados planos.
+      A identidade de máquina (machine_id) deriva deterministicamente de VITALIA_MACHINE_NAME ou
+      socket.gethostname() via SHA256[:8]. Builds reproduzem paridade estrita: local = produção.
     rationale: >
       Sistema opera em hardware heterogêneo (GTX 1060 6GB, RTX 3090,
       CPU-only). Hardcodar quebra silenciosamente em hardware diferente.

@@ -54,47 +54,89 @@ EOF
         return 0
     fi
 
-    if grep -qF "${START_MARKER}" "${target_file}" && grep -qF "${END_MARKER}" "${target_file}"; then
-        local tmp_file
-        tmp_file="$(mktemp)"
-
-        sed -n "1,/${START_MARKER}/p" "${target_file}" | grep -vF "${START_MARKER}" > "${tmp_file}" || true
-        echo "${START_MARKER}" >> "${tmp_file}"
-        printf "%s\n" "${kit_content}" >> "${tmp_file}"
-        echo "${END_MARKER}" >> "${tmp_file}"
-        sed -n "/${END_MARKER}/,\$p" "${target_file}" | grep -vF "${END_MARKER}" >> "${tmp_file}" || true
-
-        mv "${tmp_file}" "${target_file}"
-        log_ok "[ATUALIZADO] AGENTS.md: bloco do Kit atualizado entre marcadores; regras customizadas preservadas"
-        return 0
-    fi
-
-    if grep -q "AGENTS.md —" "${target_file}"; then
-        local bak_file="${backups_dir}/AGENTS.md.bak.${ts}"
-        cp "${target_file}" "${bak_file}"
-        cat << EOF > "${target_file}"
-${START_MARKER}
-${kit_content}
-${END_MARKER}
-EOF
-        log_ok "[MIGRADO] AGENTS.md legado migrado para marcadores (backup em .vitalia/backups/)"
-        return 0
-    fi
-
     local bak_file="${backups_dir}/AGENTS.md.bak.${ts}"
     cp "${target_file}" "${bak_file}"
+
+    local tmp_before
+    local tmp_after
+    local tmp_flags
+    tmp_before="$(mktemp)"
+    tmp_after="$(mktemp)"
+    tmp_flags="$(mktemp)"
+
+    awk -v start="${START_MARKER}" -v end="${END_MARKER}" -v f_before="${tmp_before}" -v f_after="${tmp_after}" '
+    BEGIN {
+        state = "BEFORE"
+        has_start = 0
+        has_end = 0
+    }
+    {
+        if (index($0, start) > 0) {
+            has_start = 1
+            state = "INSIDE"
+            close(f_after)
+            printf "" > f_after
+            next
+        }
+        if (index($0, end) > 0) {
+            has_end = 1
+            state = "AFTER"
+            next
+        }
+        if (state == "BEFORE") {
+            print $0 >> f_before
+        } else if (state == "AFTER") {
+            print $0 >> f_after
+        }
+    }
+    END {
+        print has_start, has_end
+    }
+    ' "${target_file}" > "${tmp_flags}"
+
+    local has_start=0
+    local has_end=0
+    read -r has_start has_end < "${tmp_flags}"
+    rm -f "${tmp_flags}"
+
     local tmp_file
     tmp_file="$(mktemp)"
 
-    cat << EOF > "${tmp_file}"
-${START_MARKER}
-${kit_content}
-${END_MARKER}
+    if [ "${has_start}" -eq 0 ] && [ "${has_end}" -eq 0 ]; then
+        if grep -q "AGENTS.md —" "${target_file}" || grep -q "AGENTS.md | Vitalia SPEC Kit" "${target_file}"; then
+            echo "${START_MARKER}" >> "${tmp_file}"
+            printf "%s\n" "${kit_content}" >> "${tmp_file}"
+            echo "${END_MARKER}" >> "${tmp_file}"
+            log_ok "[MIGRADO] AGENTS.md legado migrado para marcadores (backup em .vitalia/backups/)"
+        else
+            echo "${START_MARKER}" >> "${tmp_file}"
+            printf "%s\n" "${kit_content}" >> "${tmp_file}"
+            echo "${END_MARKER}" >> "${tmp_file}"
+            if grep -q '[^[:space:]]' "${tmp_before}" 2>/dev/null; then
+                echo "" >> "${tmp_file}"
+                cat "${tmp_before}" >> "${tmp_file}"
+            fi
+            log_ok "[PRESERVADO] Conteúdo customizado preservado abaixo do bloco do Kit"
+        fi
+    else
+        if grep -q '[^[:space:]]' "${tmp_before}" 2>/dev/null; then
+            cat "${tmp_before}" >> "${tmp_file}"
+            echo "" >> "${tmp_file}"
+        fi
 
-EOF
-    cat "${target_file}" >> "${tmp_file}"
+        echo "${START_MARKER}" >> "${tmp_file}"
+        printf "%s\n" "${kit_content}" >> "${tmp_file}"
+        echo "${END_MARKER}" >> "${tmp_file}"
+
+        if grep -q '[^[:space:]]' "${tmp_after}" 2>/dev/null; then
+            echo "" >> "${tmp_file}"
+            cat "${tmp_after}" >> "${tmp_file}"
+        fi
+        log_ok "[ATUALIZADO] AGENTS.md: bloco do Kit atualizado e deduplicado com sucesso"
+    fi
+
+    rm -f "${tmp_before}" "${tmp_after}"
     mv "${tmp_file}" "${target_file}"
-    log_ok "[PRESERVADO] Conteúdo customizado preservado abaixo do bloco do Kit"
     return 0
 }
 

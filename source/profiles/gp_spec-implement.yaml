@@ -27,7 +27,7 @@ phase_guardrails:
     - "Prova Empírica de Falha Prévia (P05): para tarefas [TEST:NEW] e [TEST:BUGFIX], rodar pytest no terminal ANTES de implementar o código/fix e confirmar que o teste falha pelo motivo de negócio esperado (nunca aprovar teste que já nasce passando sozinho)."
     - "Para tarefas [TEST:MIGRATION] e [TEST:REFACTOR], preservar 100% dos comportamentos estáveis mapeados na Matriz de Migração do plan.md (proibida reescrita cega que remova fallbacks ou fluxos existentes)."
     - "Proibição de Tautologia Sintática: testes devem exercitar execução real via subprocess/chamada funcional e validar invariantes de contrato do consumidor (ex: pureza de diretórios .agents/skills/)."
-    - "Proibido marcar [X] sem execução real da suíte de testes retornando código 0."
+    - "A marcação de tarefas como concluídas [X] exige a execução comportamental real da suíte de testes correspondente comprovando código de retorno 0 (Green Phase)."
 
 session_context:
   include_p0: true

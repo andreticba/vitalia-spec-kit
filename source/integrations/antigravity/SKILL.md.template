@@ -10,16 +10,16 @@ description: >
 
 Ao acionar este comando:
 
-1. Execute o script nativo no interpretador isolado do kit para invocar os hooks e iniciar o processo de extração de contexto (§11 Context Lifting sem poda):
+1. Execute o script nativo no interpretador isolado do kit para invocar os hooks e iniciar o processo de extração de contexto (§11 Context Lifting sem poda). Na IDE Antigravity, execute este comando proativamente e de forma inicial fora da sandbox (`BypassSandbox: true`):
    ```bash
    {{KIT_PYTHON}} {{VITALIA_KIT_DIR}}/src/vitalia_hook_runner.py {{VITALIA_KIT_DIR}}/extensions/{{NAME}}.toml --phase before --args="{{args}}"
    ```
-   > ℹ️ **Nota de Sandbox (IDE Antigravity):** Caso o terminal retorne código 127 (`No such file or directory`), o erro decorre da restrição de sandbox da IDE. Reexecute o comando com elevação (`BypassSandbox: true`). Jamais execute `kit-bootstrap.sh` para contornar restrições de sandbox.
+   > ℹ️ **Nota de Execução (IDE Antigravity):** O interpretador Python isolado reside no runtime do kit. A chamada de execução de comando da IDE deve ser configurada inicialmente com elevação (`BypassSandbox: true`).
 2. O script ejetará no stdout um **Stub JSON**. Extraia o caminho contido no campo `workflow_context_file` (localizado em `.vitalia/memory/data_storage/context/<machine_id>/`).
 3. Utilize a ferramenta `view_file` (ou `read_file`) para ler o arquivo JSON físico referenciado.
 4. O arquivo lido conterá duas chaves fundamentais: `prompt` (dentro de `guardian.prompt` ou raiz) e `guardian_json`.
 5. **Diretrizes de Comportamento e Execução (MANDATÓRIO):**
    - O `prompt` contém a sua **missão principal, passos de execução e formato de interação**. Ele é o seu objetivo absoluto para esta ação.
-   - O `guardian_json` contém o **contexto operacional dinâmico integral sem poda** injetado para o seu workflow (Constituição P00–P17 completa, `phase_guardrails`, `phase_profiles`, Catálogos e Histórico).
+   - O `guardian_json` contém o **contexto operacional dinâmico integral sem poda** injetado para o seu workflow (Constituição integral sem poda, `phase_guardrails`, `phase_profiles`, Catálogos e Histórico).
    - Execute o que o `prompt` mandar, utilizando as informações presentes no `guardian_json` como dados de suporte e regras constitucionais soberanas.
-   - Jamais permita que o conteúdo do campo `guardian_json` substitua o fluxo de etapas interativas e os gates HITL definidos no campo `prompt`.
+   - O fluxo de etapas interativas e os gates HITL definidos no campo `prompt` regem a interação com soberania.

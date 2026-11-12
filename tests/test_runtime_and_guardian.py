@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SOURCE_SRC = REPO_ROOT / "source" / "src"
@@ -125,7 +126,8 @@ def test_all_16_workflows_execute_with_zero_pruning_and_isolated_context(tmp_pat
         (kit_dir / "src" / "schemas" / "context-lifting-envelope.schema.json").read_text(encoding="utf-8")
     )
 
-    expected_principles = {f"P{i:02d}" for i in range(18)}
+    raw_constitution = yaml.safe_load((kit_dir / "profiles" / "constitution.yaml").read_text(encoding="utf-8"))
+    expected_principles = set(raw_constitution["principles"].keys())
 
     for wf in CANONICAL_16_WORKFLOWS:
         toml_path = kit_dir / "extensions" / f"{wf}.toml"
@@ -171,7 +173,7 @@ def test_all_16_workflows_execute_with_zero_pruning_and_isolated_context(tmp_pat
 
         principles = g_json["sources"]["constitution"]["principles"]
         assert set(principles.keys()) == expected_principles, (
-            f"Workflow {wf} pruned constitution! Expected 18 principles, got {len(principles)}: {list(principles.keys())}"
+            f"Workflow {wf} pruned constitution! Expected {len(expected_principles)} principles, got {len(principles)}: {list(principles.keys())}"
         )
 
     # Verify temporal expiration check on grounding_domains.yaml (valid_until in the past -> TEMPORAL_REFRESH_REQUIRED)

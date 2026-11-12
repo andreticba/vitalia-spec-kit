@@ -142,10 +142,6 @@ manage_kit_env() {
 
     ensure_env_var "VITALIA_ENVIRONMENT" "development" "${env_file}" "Ambiente de execução do Vitalia SPEC Kit"
 
-    if [ -n "${kit_dir_val}" ]; then
-        ensure_env_var "VITALIA_KIT_DIR" "${kit_dir_val}" "${env_file}" "Diretório de instalação do Vitalia SPEC Kit"
-    fi
-
     if [ -n "${session_repo_val}" ]; then
         ensure_env_var "SESSION_REPO" "${session_repo_val}" "${env_file}" "Repositório Git de memória de sessão"
     fi

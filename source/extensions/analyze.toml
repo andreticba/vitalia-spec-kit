@@ -66,7 +66,7 @@ Construa o inventário de `FR-xxx`, `SC-xxx`, User Stories, `tasks.md` e regras 
 1. **A. Duplicações:** FRs ou User Stories semanticamente duplicados.
 2. **B. Ambiguidades:** `SC-xxx` sem métrica observável ou baseados apenas em existência sintática de arquivos; US sem `Independent Test`.
 3. **C. Subespecificação e Omissão de Migração:** FRs sem tasks; US sem fase; componentes existentes refatorados sem entrada na **Matriz de Migração e Preservação Comportamental** no `plan.md` (`CRITICAL`).
-4. **D. Violações da Constituição:** Qualquer elemento do `plan.md` ou `tasks.md` que contradiga `MUST`/`BLOCKING` da Constituição (P00–P17 sem poda), ausência de Medical Gate em saúde (`CRITICAL`) ou ausência do Test Depth Agreement (TDA) no `plan.md`.
+4. **D. Violações da Constituição:** Qualquer elemento do `plan.md` ou `tasks.md` que contradiga `MUST`/`BLOCKING` da Constituição integral sem poda, ausência de Medical Gate em saúde (`CRITICAL`) ou ausência do Test Depth Agreement (TDA) no `plan.md`.
 5. **E. Gaps de Cobertura:** FRs com zero tasks associadas (`CRITICAL`) ou tasks órfãs sem rastreabilidade.
 6. **F. Inconsistências de Terminologia e Contrato do Consumidor:** Drift de nomes entre `spec`, `plan` e `tasks`, ou violação de invariantes de diretórios do cliente (ex: criação de `.trash` ou `.vitalia-manifest` dentro de `.agents/skills/`) (`CRITICAL`).
 7. **G. Superficialidade de Testes e Ausência de Cenário de Falsificação (P05):**

@@ -26,7 +26,7 @@ phase_guardrails:
   phase: "brainstorming"
   role: "Nexus Socrático & Supervisor de Concepção"
   mandatory_checks:
-    - "STOP -> SCAN -> ASK (máx 3 perguntas) -> WAIT: proibido gerar spec/plan/tasks/código durante a ideação."
+    - "STOP -> SCAN -> ASK (máx 3 perguntas) -> WAIT: o foco da ideação concentra-se exclusivamente no refinamento socrático de requisitos e arquitetura conceitual."
     - "Engenharia Reversa Funcional em 3 Camadas para refatorações: (1) Intenção de Negócio Pura a preservar; (2) Infraestrutura Legada a purgar; (3) Contrato Estrito do Consumidor (ex: Antigravity IDE)."
     - "Grounding de Fronteira via Sub-Agente (vitalia-researcher / self com rede): validar links (HTTP 200), ler páginas completas, detectar métodos depreciados e registrar Tabela de Proveniência."
     - "Classificação preliminar da natureza da mudança para a Matriz de Testes P05 ([TEST:NEW], [TEST:BUGFIX], [TEST:REFACTOR], [TEST:MIGRATION])."

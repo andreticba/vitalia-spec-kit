@@ -244,9 +244,10 @@ def test_install_project_skills_directory_purity(tmp_path: Path):
     # Old vitalia skill must be moved to .vitalia/backups/, not left in .agents/skills/
     assert not old_vitalia_skill.exists(), "Obsolete vitalia-* skill was not cleaned from .agents/skills/"
 
-    # Exactly 16 vitalia-* skills must exist and have {{VITALIA_KIT_DIR}} resolved
+    # All active vitalia-* skills matching extensions must exist and have {{VITALIA_KIT_DIR}} resolved
+    expected_vitalia_count = len(list((kit_dir / "extensions").glob("*.toml")))
     vitalia_skills = sorted(p for p in entries if p.is_dir() and p.name.startswith("vitalia-"))
-    assert len(vitalia_skills) == 16, f"Expected 16 vitalia-* skills, found {len(vitalia_skills)}: {[p.name for p in vitalia_skills]}"
+    assert len(vitalia_skills) == expected_vitalia_count, f"Expected {expected_vitalia_count} vitalia-* skills, found {len(vitalia_skills)}: {[p.name for p in vitalia_skills]}"
 
     for skill_folder in vitalia_skills:
         skill_md = skill_folder / "SKILL.md"

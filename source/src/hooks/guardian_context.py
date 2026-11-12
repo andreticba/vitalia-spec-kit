@@ -4,7 +4,7 @@
 Guardião de Contexto Constitucional e Compilador Sem Poda — Vitalia SPEC Kit v0.0.1
 
 Política Incondicional de Zero Poda (FR-005 / ADR-0001):
-- Todos os 16 workflows operam com 100% da Constituição (P00–P17) e dos catálogos solicitados,
+- Todos os workflows operam com 100% da Constituição integral sem poda e dos catálogos solicitados,
   sem qualquer algoritmo ou adaptador de poda de tokens (token_budget = 0).
 - Valida a janela temporal (valid_until) de grounding_domains.yaml e dynamic_questioning.yaml,
   marcando entradas expiradas como TEMPORAL_REFRESH_REQUIRED.
@@ -36,7 +36,7 @@ except ImportError:
 
 
 class GuardianContextV2:
-    """Compilador de Context Engineering 100% Sem Poda para os 16 workflows do Vitalia SPEC Kit."""
+    """Compilador de Context Engineering 100% Sem Poda para os workflows do Vitalia SPEC Kit."""
 
     def __init__(
         self,

@@ -55,7 +55,7 @@ class ConstitutionRenderer:
                 p_name = p_info.get("name", pid)
                 lines.append(f'  D_{domain_id} --> P_{pid}["⚡ {pid}: {p_name}"]')
 
-        lines.extend(["```", "", "---", "", "## 📑 Domínios e Princípios Invioláveis (P00–P17)", ""])
+        lines.extend(["```", "", "---", "", "## 📑 Domínios e Princípios Invioláveis", ""])
 
         for domain_id, pids in domain_index.items():
             lines.append(f"### 📦 {domain_id}")

@@ -25,7 +25,7 @@ phase_guardrails:
   role: "Engenheiro de Requisitos & Guardião de Contratos"
   mandatory_checks:
     - "Acceptance Scenarios (Given/When/Then) e Success Criteria (SC-xxx) DEVEM definir comportamentos observáveis de caixa-preta e invariantes de contrato do consumidor."
-    - "PROIBIDO definir critérios de sucesso baseados apenas na mera existência sintática de arquivos ou strings."
+    - "Critérios de sucesso definem-se exclusivamente através de comportamentos observáveis de negócio, cenários BDD e asserções executáveis de caixa-preta."
     - "Grounding de Fronteira (P03): toda suposição externa exige delegação ao Sub-Agente de pesquisa com HTTP 200 comprovado, leitura integral da documentação e verificação de não-depreciação."
     - "Submissão obrigatória ao /vitalia-judge --mode=specify com pausa HITL soberana."
 

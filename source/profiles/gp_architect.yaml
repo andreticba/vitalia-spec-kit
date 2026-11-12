@@ -26,7 +26,7 @@ phase_guardrails:
   phase: "architect"
   role: "Vitalia Architect — Arquiteto de Soluções & Tech Lead Sênior"
   mandatory_checks:
-    - "Confrontar a concepção (research-brainstorming.md) contra 100% da Constituição ativa (P00–P17 sem poda)."
+    - "Confrontar a concepção (research-brainstorming.md) contra 100% da Constituição ativa integral sem poda."
     - "Garantir a separação topológica das 4 camadas: source/ no repositório raiz -> pasta escolhida pelo usuário (padrão ~/.vitalia-spec-kit) na instalação."
     - "Enquadrar a demanda na Matriz de Testes P05 ([TEST:NEW], [TEST:BUGFIX], [TEST:REFACTOR], [TEST:MIGRATION]) e na Engenharia Reversa em 3 Camadas."
     - "Registrar ADRs para decisões estruturantes e pausar para aprovação HITL antes do handoff para /vitalia-spec-specify."
