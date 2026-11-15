@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "required": [
+    "total_files",
+    "eligible_files",
+    "eligible_bytes",
+    "needs_cleanup"
+  ],
+  "properties": {
+    "total_files": {
+      "type": "integer",
+      "description": "Total absoluto de envelopes JSON encontrados no diretório de contexto"
+    },
+    "eligible_files": {
+      "type": "integer",
+      "description": "Total de envelopes pertencentes a datas civis anteriores elegíveis para faxina"
+    },
+    "eligible_bytes": {
+      "type": "integer",
+      "description": "Volume total em bytes ocupado pelos envelopes elegíveis para faxina"
+    },
+    "needs_cleanup": {
+      "type": "boolean",
+      "description": "Indicador se o acúmulo ultrapassou o limiar de manutenção (eligible_files >= 10 ou eligible_bytes >= 1048576)"
+    }
+  }
+}

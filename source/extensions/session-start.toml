@@ -1,4 +1,4 @@
-# session-start.toml | Vitalia SPEC Kit v0.0.1 | 08-11-2026 19:52(GMT-04:00)
+# session-start.toml | Vitalia SPEC Kit v0.0.1 | 15-11-2026 13:59(GMT-04:00)
 description = "Inicia sessão de trabalho recuperando contexto completo do projeto."
 
 [meta]
@@ -88,6 +88,12 @@ O agente deve ler os seguintes arquivos em `.vitalia/memory/session/`:
 
 ### 📝 Notas / Aprendizados Recentes
 [Extraído de LEARNINGS.md - Liste apenas os não-processados]
+
+{{#if context_cleanup.needs_cleanup}}
+### 💡 Dica de Manutenção de Contexto
+Existem arquivos transitórios de sessões anteriores acumulados. Para liberar espaço com segurança, execute:
+`source/bin/vitalia-clean` (ou `vitalia-clean --dry-run` para simular).
+{{/if}}
 
 ---
 **Deseja continuar com o item P0, ou tem outro foco para hoje?**

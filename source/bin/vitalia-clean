@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# vitalia-clean | Vitalia SPEC Kit v0.0.1 | 15-11-2026 13:59(GMT-04:00)
+# Executável Shim para o Utilitário Autônomo de Faxina de Contexto
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SOURCE_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+CLEANUP_SCRIPT="${SOURCE_ROOT}/src/vitalia_tmp_cleanup.py"
+
+if [[ ! -f "${CLEANUP_SCRIPT}" ]]; then
+    echo "Erro: Utilitário de faxina não encontrado em ${CLEANUP_SCRIPT}" >&2
+    exit 1
+fi
+
+exec python3 "${CLEANUP_SCRIPT}" "$@"

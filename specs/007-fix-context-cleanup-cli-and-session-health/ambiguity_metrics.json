@@ -1,0 +1,24 @@
+{
+  "spec_file": "specs/007-fix-context-cleanup-cli-and-session-health/spec.md",
+  "audit_timestamp": "15-11-2026 12:18:00(GMT-04:00)",
+  "judge_mode": "clarify",
+  "framework": "ISO/IEC/IEEE 29148 & Berry et al. (10 Categories)",
+  "total_lines": 348,
+  "ambiguities_detected": [],
+  "ambiguity_count": 0,
+  "defect_density_per_100_lines": 0.0,
+  "status": "APPROVED",
+  "categories_evaluated": {
+    "lexical": { "count": 0, "status": "CLEAR" },
+    "syntactic": { "count": 0, "status": "CLEAR" },
+    "semantic": { "count": 0, "status": "CLEAR" },
+    "pragmatic": { "count": 0, "status": "CLEAR" },
+    "vagueness": { "count": 0, "status": "CLEAR" },
+    "generality": { "count": 0, "status": "CLEAR" },
+    "incompleteness": { "count": 0, "status": "CLEAR" },
+    "referential": { "count": 0, "status": "CLEAR" },
+    "cross_document_contradiction": { "count": 0, "status": "CLEAR" },
+    "consumer_contract_omission": { "count": 0, "status": "CLEAR" }
+  },
+  "recommendation": "Advance to /vitalia-spec-plan directly. Zero blocking or warning ambiguities."
+}

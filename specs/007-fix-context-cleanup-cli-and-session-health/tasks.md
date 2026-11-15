@@ -1,0 +1,120 @@
+<!-- tasks.md | Vitalia SPEC Kit v0.0.1 | 15-11-2026 13:48(GMT-04:00) -->
+> **tasks.md | Vitalia SPEC Kit v0.0.1 | 15-11-2026 13:48(GMT-04:00)**
+<!-- constitutional-status: APPROVED | auditor: red-team-vitalia | timestamp: 2026-11-15T13:48:42-04:00 | report: Relatório de inspeção.md -->
+
+# Tasks: [BUGFIX] Faxineiro de Contexto CLI & Saúde de Sessão
+
+**Spec**: [spec.md](file:///home/andre/projetos/assistidos/vitalia-spec-kit/specs/007-fix-context-cleanup-cli-and-session-health/spec.md) | **Plan**: [plan.md](file:///home/andre/projetos/assistidos/vitalia-spec-kit/specs/007-fix-context-cleanup-cli-and-session-health/plan.md)  
+**Gerado em**: 15-11-2026 13:19 (GMT-04:00)
+
+---
+
+## MVP Scope
+
+> **MVP Scope = Phase 0 + Phase 1 + Phase 2 + Phase 3 (US1)**.  
+> A entrega da US1 restaura a segurança de dados, o menu interativo e as flags não-interativas do utilitário central `vitalia_tmp_cleanup.py`, impedindo perda de dados ativos da sessão de trabalho. As fases 4 e 5 adicionam observabilidade e ergonomia.
+
+---
+
+## Phase 0: Grounding & Environment
+
+*Verificações de ambiente e integridade dos interpretadores isolados (P11). Sem label de US.*
+
+- [X] T000-A Verificar interpretador do kit: `/home/andre/.vitalia-spec-kit/.venv/bin/python3 --version`
+- [X] T000-B Verificar integridade de dependências padrão: `python3 -c "import datetime, re, os, sys, pathlib, argparse, shutil, json; print('OK')"`
+- [X] T000-C Validar integridade dos contratos OpenAPI 3.0 Limpo: `python3 -c "import json, jsonschema; s = json.load(open('specs/007-fix-context-cleanup-cli-and-session-health/contracts/context_cleanup.schema.json')); jsonschema.Draft7Validator.check_schema(s); print('SCHEMA_OK')"`
+
+---
+
+## Phase 1: Setup
+
+*Preparação do ambiente de testes e fixtures de reprodução de defeito. Sem label de US.*
+
+- [X] T001 Criar diretório de testes unitários caso não exista: `source/tests/`
+- [X] T002 Implementar fixture de apoio para geração de arquivos temporários de contexto simulados (datas passadas e data de hoje em GMT-04:00) em `source/tests/conftest.py`
+
+---
+
+## Phase 2: Foundational & Red Phase (`[TEST:BUGFIX]`)
+
+*Testes de reprodução do defeito (Red-First) contra o código atual. Sem label de US.*
+
+- [X] T003 [TEST:BUGFIX] Criar teste de reprodução para preservação da sessão ativa em `source/tests/test_vitalia_tmp_cleanup.py` — Cenário de Falsificação: o teste DEVE FALHAR contra a implementação atual de `source/src/vitalia_tmp_cleanup.py` que apaga arquivos de hoje indiscriminadamente sem filtrar por data civil GMT-04:00.
+- [X] T004 [TEST:BUGFIX] Criar teste de reprodução para `--dry-run` em `source/tests/test_vitalia_tmp_cleanup.py` — Cenário de Falsificação: o teste DEVE FALHAR contra a implementação atual que não implementa o argumento `--dry-run` ou apaga arquivos mesmo quando a flag é passada.
+- [X] T005 [TEST:BUGFIX] Criar teste de reprodução para menu interativo `[a/d/n/t]` e parser de faixas em `source/tests/test_vitalia_tmp_cleanup.py` — Cenário de Falsificação: o teste DEVE FALHAR contra a implementação atual que não possui prompt interativo nem suporte à sintaxe de faixas (`1,2`, `1-3`).
+
+---
+
+## Phase 3: User Story 1 — Limpeza Granular com Preservação de Hoje (P1)
+
+**Story Goal**: O operador pode limpar arquivos efêmeros de contexto com segurança total, garantindo que o dia civil atual seja preservado por padrão e escolhendo entre menu interativo ou flags não-interativas.  
+**Independent Test**: Executar `source/tests/test_vitalia_tmp_cleanup.py` e comprovar transição de RED para GREEN.  
+**Referência**: FR-001, FR-002, FR-003, FR-004
+
+- [X] T006 [P] [US1] Implementar parser de timestamps GMT-04:00 e agrupamento civil de arquivos em `source/src/vitalia_tmp_cleanup.py`
+- [X] T007 [P] [US1] Implementar parser de argumentos CLI (`--dry-run`, `--force`, `--purge-all`, `--target-dir`) com ajuda didática P10 em `source/src/vitalia_tmp_cleanup.py`
+- [X] T008 [US1] Implementar menu interativo com opções `[a]`, `[d]`, `[n]`, `[t]` (com Padrão Afirmativo `[s/N]`) e parser de faixas em `source/src/vitalia_tmp_cleanup.py`
+- [X] T009 [US1] Executar `pytest source/tests/test_vitalia_tmp_cleanup.py` e comprovar transição GREEN de todos os cenários da US1
+
+---
+
+## Phase 4: User Story 2 — Observabilidade de Contexto no Sensor scan_environment (P2)
+
+**Story Goal**: A sonda de ambiente monitora o volume de contexto efêmero acumulado sem adicionar overhead perceptual (<50ms) e emite métrica conforme OpenAPI 3.0 Limpo.  
+**Independent Test**: Executar `python3 source/src/hooks/scan_environment.py` e validar schema do nó `context_cleanup`.  
+**Referência**: FR-005, FR-005.1, FR-005.2
+
+- [X] T010 [TEST:BUGFIX] Criar teste para validação do nó `context_cleanup` em `source/tests/test_scan_environment_cleanup.py` — Cenário de Falsificação: o teste DEVE FALHAR contra o sensor atual `source/src/hooks/scan_environment.py` que não emite o nó `context_cleanup` na saída JSON.
+- [X] T011 [US2] Implementar função ultraleve de contagem de contexto via `os.scandir` em `source/src/hooks/scan_environment.py` garantindo overhead < 50ms
+- [X] T012 [US2] Integrar emissão do nó `context_cleanup` na saída JSON de `source/src/hooks/scan_environment.py` conforme `contracts/context_cleanup.schema.json`
+- [X] T013 [US2] Executar `pytest source/tests/test_scan_environment_cleanup.py` e comprovar conformidade GREEN com contrato OpenAPI 3.0 Limpo
+
+---
+
+## Phase 5: User Story 3 — Atalho Executável CLI e Lembrete de Sessão (P3)
+
+**Story Goal**: O operador pode invocar o faxineiro diretamente via comando `vitalia-clean` e recebe lembretes não-intrusivos no checklist de início de sessão quando houver arquivos acumulados.  
+**Independent Test**: Invocação direta de `source/bin/vitalia-clean --help` e inspeção do prompt em `session-start.toml`.  
+**Referência**: FR-006, FR-007
+
+- [X] T014 [US3] Criar script shim executável em bash `source/bin/vitalia-clean` com `chmod +x`
+- [X] T015 [TEST:NEW] Criar teste funcional para invocação do shim `source/bin/vitalia-clean` em `source/tests/test_vitalia_clean_bin.py` — Cenário de Falsificação: o teste falha se o script shim não for executável ou não repassar argumentos corretamente para `vitalia_tmp_cleanup.py`.
+- [X] T016 [US3] Atualizar `source/extensions/session-start.toml` para incluir aviso não-intrusivo de manutenção de contexto quando `context_cleanup.needs_cleanup == True`
+- [X] T017 [US3] Executar `pytest source/tests/test_vitalia_clean_bin.py` e comprovar validação GREEN
+
+---
+
+## Phase 6: Polish & Acceptance Scenarios
+
+*Validação cruzada de conformidade, timestamps P04 e cenários de aceitação do quickstart. Sem label de US.*
+
+- [X] T018 Executar todos os 4 cenários de aceitação documentados em `specs/007-fix-context-cleanup-cli-and-session-health/quickstart.md`
+- [X] T019 Validar cabeçalhos duplos e timestamp GMT-04:00 (P04) em todos os arquivos modificados ou criados via `header_stamp.py` ou verificação manual
+- [X] T020 Executar suite completa de testes `pytest source/tests/` com cobertura 100% dos fluxos corrigidos
+
+---
+
+## Dependency Graph
+
+```text
+Phase 0 (Grounding)
+       ↓
+Phase 1 (Setup)
+       ↓
+Phase 2 (Red Phase [TEST:BUGFIX])
+       ↓
+Phase 3 (US1: vitalia_tmp_cleanup.py) ──→ MVP Concluído
+       ↓
+Phase 4 (US2: scan_environment.py)
+       ↓
+Phase 5 (US3: bin & session-start)
+       ↓
+Phase 6 (Polish & Quickstart Scenarios)
+```
+
+---
+
+## Parallel Execution
+
+- As tarefas `T006` (Parser de timestamps) e `T007` (Parser CLI) na **Phase 3** podem ser desenvolvidas em paralelo.
+- A **Phase 4 (US2)** e a **Phase 5 (US3)** podem ser desenvolvidas de forma desacoplada após a conclusão da Phase 3.
